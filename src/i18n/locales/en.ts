@@ -222,10 +222,10 @@ If you have any questions or concerns regarding this Privacy Policy, please cont
     about: {
         title: "About Us",
         version: "App Version",
-        description: "This application is developed to provide users with the best experience in managing their tasks efficiently and effectively. Our mission is to deliver high-quality services that meet the needs of our users.",
+        description: "This application helps employees and managers track attendance, manage leave requests, and monitor work schedules. It allows users to check attendance records, submit and approve leave requests, and manage working shifts efficiently within the organization.",
         developer: "Developed by ABC Company",
         contact: "Contact Us at support@example.com",
-        appName: "Task Manager App",
+        appName: "Attendance & Leave Management",
     },
     language: {
         title: "Language",

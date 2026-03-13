@@ -49,6 +49,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '~/utils/toast/toastConfig';
 import { initLanguage } from './src/i18n/initLanguage';
 import { ThemeProvider, useTheme } from '~/context/ThemeContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 function RootApp() {
   const { theme } = useTheme();
@@ -82,19 +83,24 @@ function App() {
   //   AsyncStorage.setItem('SECURITY_BIOMETRIC', JSON.stringify(biometric));
   // }, [biometric]);
 
-
+  const queryClient = new QueryClient();
   if (!ready) return null;
 
   return (
-    <Provider store={store}>
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <NavigationContainer>
-            <RootApp />
-          </NavigationContainer>
-        </ThemeProvider>
-      </SafeAreaProvider>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <SafeAreaProvider>
+
+          <ThemeProvider>
+            <NavigationContainer>
+              <RootApp />
+            </NavigationContainer>
+          </ThemeProvider>
+
+        </SafeAreaProvider>
+      </Provider>
+    </QueryClientProvider>
+
   );
 }
 

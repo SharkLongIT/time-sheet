@@ -29,6 +29,8 @@ import HomeScreen from '~/screens/home/HomeScreen';
 import NotificationScreen from '~/screens/notification/NotificationScreen';
 import MenuScreen from '~/screens/menu/MenuScreen';
 import { useNotifications } from '~/hooks/useNotifications';
+import HomeManagerScreen from '~/screens/home/HomeManagerScreen';
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 /* -------------------- Types -------------------- */
 export type BottomTabParamList = {
@@ -36,7 +38,7 @@ export type BottomTabParamList = {
     Notifications: undefined;
     Menu: undefined;
     Profile: undefined;
-    Filter: undefined;
+    HomeManager: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -51,14 +53,6 @@ const TAB_WIDTH = TAB_BAR_WIDTH / TAB_COUNT;
 /* -------------------- Tab Item -------------------- */
 const TabItem = ({ focused, icon, label }: any) => {
     const scale = useRef(new Animated.Value(1)).current;
-
-    // useEffect(() => {
-    //     Animated.spring(scale, {
-    //         toValue: focused ? 1.1 : 1,
-    //         useNativeDriver: true,
-    //     }).start();
-    // }, [focused]);
-
     return (
         <Animated.View
             style={{
@@ -133,65 +127,67 @@ export default function BottomTabNavigator() {
                 name="Home"
                 component={HomeScreen}
                 options={{
-                    // tabBarLabel: TAB_LABEL.HOME,
                     tabBarLabel: t('tab.home'),
-                    tabBarIcon: ({ focused }) =>
-                        focused ? <HomeIconActive /> : <HomeIcon />,
+                    tabBarIcon: ({ focused }) => (
+                        <Ionicons
+                            name={focused ? "home" : "home-outline"}
+                            size={22}
+                            color={focused ? appColors.hight_light : "#9CA3AF"}
+                        />
+                    ),
                 }}
             />
 
             <Tab.Screen
-                name="Filter"
-                component={FilterScreen}
+                name="HomeManager"
+                component={HomeManagerScreen}
                 options={{
-                    // tabBarLabel: TAB_LABEL.SEARCH,
-                    tabBarLabel: t('tab.search'),
-                    tabBarIcon: ({ focused }) =>
-                        focused ? <SearchIconActive /> : <SearchIcon />,
+                    tabBarLabel: "Quản lý",
+                    tabBarIcon: ({ focused }) => (
+                        <Ionicons
+                            name={focused ? "grid" : "grid-outline"}
+                            size={22}
+                            color={focused ? appColors.hight_light : "#9CA3AF"}
+                        />
+                    ),
                 }}
             />
-
-            {/* <Tab.Screen
-                name="Notifications"
-                component={NotificationScreen}
-                options={{
-                    // tabBarLabel: TAB_LABEL.NOTIFICATION,
-                    tabBarLabel: t('tab.notification'),
-                    tabBarIcon: ({ focused }) =>
-                        focused ? <NotiIconActive /> : <NotiIcon />,
-                }}
-            /> */}
             <Tab.Screen
                 name="Notifications"
                 component={NotificationScreen}
                 options={{
                     tabBarLabel: t('tab.notification'),
-                    tabBarIcon: ({ focused }) => {
+                    tabBarIcon: ({ focused }) => (
+                        <View style={{ width: 28, height: 28 }}>
+                            <Ionicons
+                                name={focused ? "notifications" : "notifications-outline"}
+                                size={24}
+                                color={focused ? appColors.hight_light : "#9CA3AF"}
+                            />
 
-                        return (
-                            <View style={{ width: 28, height: 28 }}>
-                                {focused ? <NotiIconActive /> : <NotiIcon style={{ width: 28, height: 28, marginLeft: 4 }} />}
-
-                                {items.length > 0 && (
-                                    <View style={styles.badge}>
-                                        <Text style={styles.badgeText}>
-                                            {items.length > 99 ? '99+' : items.length}
-                                        </Text>
-                                    </View>
-                                )}
-                            </View>
-                        );
-                    },
+                            {items.length > 0 && (
+                                <View style={styles.badge}>
+                                    <Text style={styles.badgeText}>
+                                        {items.length > 99 ? "99+" : items.length}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+                    ),
                 }}
             />
             <Tab.Screen
                 name="Menu"
                 component={MenuScreen}
                 options={{
-                    // tabBarLabel: TAB_LABEL.MENU,
                     tabBarLabel: t('tab.menu'),
-                    tabBarIcon: ({ focused }) =>
-                        focused ? <MenuIconActive /> : <MenuIcon />,
+                    tabBarIcon: ({ focused }) => (
+                        <Ionicons
+                            name={focused ? "menu" : "menu-outline"}
+                            size={22}
+                            color={focused ? appColors.hight_light : "#9CA3AF"}
+                        />
+                    ),
                 }}
             />
         </Tab.Navigator>

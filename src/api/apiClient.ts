@@ -12,7 +12,8 @@ import { clearData, getData } from '~/utils/helper/storage';
 // =======================
 // CONFIG
 // =======================
-const BASE_URL = 'http://192.168.0.38:36004';
+// const BASE_URL = 'https://diemdanh.ai.vn';
+const BASE_URL = 'http://192.168.0.39:51080';
 
 // =======================
 // TOKEN HELPERS (mock)

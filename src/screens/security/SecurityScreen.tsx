@@ -80,7 +80,7 @@ const SecurityScreen = () => {
                 </Section>
 
                 {/* AUTH */}
-                <Section title={t('security.authentication')}>
+                {/* <Section title={t('security.authentication')}>
                     <SwitchItem
                         title={t('security.twoFA')}
                         value={twoFA}
@@ -91,7 +91,7 @@ const SecurityScreen = () => {
                         value={biometric}
                         onValueChange={handleBiometricToggle}
                     />
-                </Section>
+                </Section> */}
 
                 {/* SESSION */}
                 <Section title={t('security.sessions')}>

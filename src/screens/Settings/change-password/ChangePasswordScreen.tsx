@@ -19,6 +19,9 @@ import HeaderMain from '~/components/layout/base-header/header-main';
 import { t } from 'i18next';
 import { useAppColors } from '~/hooks/useAppColors';
 import { showToast } from '~/utils/toast';
+import authApi from '~/api/auth.api';
+import { useAppDispatch } from '~/redux/hooks';
+import { handleLogout } from '~/thunk/authThunk';
 
 const ChangePasswordScreen = () => {
     const colors = useAppColors();
@@ -30,6 +33,7 @@ const ChangePasswordScreen = () => {
     const hasNumber = /\d/.test(newPassword);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
     const hasLetter = /[a-zA-Z]/.test(newPassword);
+    const dispatch = useAppDispatch();
 
     const renderRequirement = (text: string, condition: boolean) => (
         <View style={localStyles.requirementRow}>
@@ -54,11 +58,12 @@ const ChangePasswordScreen = () => {
                     currentPassword: password,
                     newPassword: newPassword,
                 };
-                // await changePassword(data);
+                await authApi.changePassword(data);
                 showToast('success', t('password.success'), t('password.pleaseLogin'), 'top')
                 // navigation.goBack();
                 await AsyncStorage.removeItem('access_token');
-                //await logout();
+                // await logout();
+                dispatch(handleLogout());
             } catch (err: any) {
                 if (err.response?.data?.error) {
                     //   Toast.show({

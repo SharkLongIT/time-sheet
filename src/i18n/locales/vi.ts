@@ -223,11 +223,10 @@ Nếu bạn có bất kỳ câu hỏi hoặc quan ngại nào về chính sách 
     about: {
         title: "Về chúng tôi",
         version: "Phiên bản ứng dụng",
-        description: "Ứng dụng này được phát triển nhằm mang đến cho người dùng trải nghiệm tốt nhất trong việc quản lý công việc một cách hiệu quả và hiệu suất. Sứ mệnh của chúng tôi là cung cấp các dịch vụ chất lượng cao đáp ứng nhu cầu của người dùng.",
-        developer: "Được phát triển bởi Công ty ABC",
-        contact: "Liên hệ với chúng tôi tại support@example.com",
-        appName: "Ứng dụng Quản lý Công việc",
-
+        description: "Ứng dụng này hỗ trợ nhân viên và quản lý theo dõi chấm công, quản lý đơn nghỉ phép và theo dõi lịch làm việc. Người dùng có thể xem lịch sử chấm công, gửi và phê duyệt đơn nghỉ phép, cũng như quản lý ca làm việc một cách thuận tiện và hiệu quả trong tổ chức.",
+        developer: "Phát triển bởi Công ty ABC",
+        contact: "Liên hệ: support@example.com",
+        appName: "Quản lý chấm công & nghỉ phép",
     },
     language: {
         title: "Ngôn ngữ",

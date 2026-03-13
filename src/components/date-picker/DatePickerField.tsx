@@ -67,14 +67,14 @@ const DatePickerField = ({
                         </TouchableOpacity>
 
                         {/* SELECT MODE */}
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             style={styles.modeBtn}
                             onPress={toggleMode}
                         >
                             <Text style={styles.modeText}>
                                 {mode === "date" ? "Date" : "Time"} ▾
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                         <TouchableOpacity onPress={onConfirm}>
                             <Text style={styles.confirm}>{t("common.done")}</Text>

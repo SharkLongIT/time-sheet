@@ -28,5 +28,10 @@ const authApi = {
     getUser() {
         return apiClient.get<IApiBaseResponse<IUser>>('/api/services/app/Session/GetCurrentLoginInformations');
     },
+    changePassword(data: any) {
+        return apiClient.post('/api/services/app/Profile/ChangePassword', data);
+
+    }
 };
 export default authApi;
+

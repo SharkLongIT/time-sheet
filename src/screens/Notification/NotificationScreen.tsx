@@ -20,6 +20,7 @@ import NotificationSkeleton from "~/components/skeleton-base/LoadingSkeletonNoti
 import { useAppColors } from "~/hooks/useAppColors";
 import { useNotifications } from "~/hooks/useNotifications";
 import { MainParamList } from "~/navigation/MainNavigator";
+import { formatDateRender } from "~/utils/format/format";
 import getNotiColor from "~/utils/helper/color-noti";
 
 const NotificationScreen = () => {
@@ -84,7 +85,7 @@ const NotificationScreen = () => {
                                 {item.content}
                             </Text>
                             <Text style={[styles.time, { color: colors.textSecondary },]} >
-                                {item.time}
+                                {formatDateRender(item.time, "dd/MM/yyyy")}
                             </Text>
                         </View>
                     </View>

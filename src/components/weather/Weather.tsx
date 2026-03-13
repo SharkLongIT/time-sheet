@@ -62,7 +62,7 @@ export default function WeatherHeader() {
                     )}
                     <Text style={styles.subText}>{typedText}</Text>
                 </View>
-                <DrawIcon onPress={() => navigationDraw.openDrawer()} width={28} height={28} />
+                {/* <DrawIcon onPress={() => navigationDraw.openDrawer()} width={28} height={28} /> */}
             </View>
 
             <View style={styles.divider}></View>

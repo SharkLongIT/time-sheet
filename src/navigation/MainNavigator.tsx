@@ -18,6 +18,14 @@ import HelpSupportScreen from '~/screens/help-support/HelpSupportScreen';
 import { useAppColors } from '~/hooks/useAppColors';
 import DrawerNavigator from './DrawerNavigator';
 import ActiveSessionsScreen from '~/screens/security/ActiveSessionsScreen';
+import HolidayScreen from '~/screens/holiday/HolidayScreen';
+import LeaveRequestScreen from '~/screens/leave-request/LeaveRequest';
+import AttendanceCalendarScreen from '~/screens/attendance-calendar/AttendanceCalendarScreen';
+import ShiftScheduleScreen from '~/screens/shift-schedule/ShiftScheduleScreen';
+import HomeManagerScreen from '~/screens/home/HomeManagerScreen';
+import LeaveRequestManageScreen from '~/screens/leave-request-manage/LeaveRequestManage';
+import ListUsersAttendanceCalendarScreen from '~/screens/attendance-calendar/ListUsersAttendanceCalendarScreen';
+import ListUsersShiftScheduleScreen from '~/screens/shift-schedule/ListUsersShiftScheduleScreen';
 
 export type MainParamList = {
     // MainTab: NavigatorScreenParams<BottomTabParamList>;
@@ -34,6 +42,14 @@ export type MainParamList = {
     Language: undefined;
     ActiveSessions: undefined;
 
+    Holiday: undefined;
+    LeaveRequest: undefined;
+    AttendanceCalendar: { userId?: number };
+    ShiftSchedule: { userId?: number };
+    HomeManager: undefined;
+    LeaveRequestManage: undefined;
+    ListUsersAttendanceCalendar: undefined;
+    ListUsersShiftSchedule: undefined
 
 };
 export type DrawerParamList = {
@@ -79,6 +95,15 @@ export default function MainStack() {
             <Stack.Screen name="About" options={{ title: t('tab.about') }} component={AboutScreen} />
             <Stack.Screen name="Language" options={{ title: t('tab.language') }} component={LanguageScreen} />
             <Stack.Screen name="ActiveSessions" options={{ title: t('security.activeSessions') }} component={ActiveSessionsScreen} />
+            <Stack.Screen name="Holiday" options={{ title: 'Kỳ nghỉ' }} component={HolidayScreen} />
+            <Stack.Screen name="LeaveRequest" options={{ title: 'Nghỉ phép' }} component={LeaveRequestScreen} />
+            <Stack.Screen name="AttendanceCalendar" options={{ title: 'Chấm công' }} component={AttendanceCalendarScreen} />
+            <Stack.Screen name="ShiftSchedule" options={{ title: 'Lịch làm việc' }} component={ShiftScheduleScreen} />
+            <Stack.Screen name="HomeManager" options={{ title: 'Lịch làm việc' }} component={HomeManagerScreen} />
+            <Stack.Screen name="LeaveRequestManage" options={{ title: 'Quản lý nghỉ phép' }} component={LeaveRequestManageScreen} />
+            <Stack.Screen name="ListUsersAttendanceCalendar" options={{ title: 'Quản lý chấm công' }} component={ListUsersAttendanceCalendarScreen} />
+            <Stack.Screen name="ListUsersShiftSchedule" options={{ title: 'Lịch ca làm việc' }} component={ListUsersShiftScheduleScreen} />
+
         </Stack.Navigator>
     );
 }

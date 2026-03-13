@@ -53,7 +53,6 @@ export const useNotifications = () => {
                 maxResultCount: pageSize,
 
             });
-            console.log(res)
 
             const rawItems = res.data.result.items;
             const mappedItems = rawItems.map(mapNotification);
