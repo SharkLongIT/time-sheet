@@ -8,8 +8,8 @@ import { openComposer } from "react-native-email-link";
 
 const FAQS = [
     { key: 'reset_password', icon: 'lock', link: 'https://example.com/reset-password' },
-    { key: 'change_language', icon: 'globe', link: 'https://example.com/language' },
-    { key: 'contact_support', icon: 'mail', link: 'mailto:support@example.com' },
+    // { key: 'change_language', icon: 'globe', link: 'https://example.com/language' },
+    { key: 'contact_support', icon: 'mail', link: 'mailto:bbksolution1@gmail.com' },
 ];
 
 export default function HelpSupportScreen() {
@@ -54,11 +54,11 @@ export default function HelpSupportScreen() {
                             {open === item.key && (
                                 <View style={styles.answerWrap}>
                                     <Text style={[styles.answer, { color: colors.textSecondary }]}>{t(`help.${item.key}.a`)}</Text>
-                                    {!!item.link && (
+                                    {/* {!!item.link && (
                                         <TouchableOpacity onPress={() => Linking.openURL(item.link)}>
                                             <Text style={[styles.link, { color: colors.primary }]}>{t('help.learn_more')}</Text>
                                         </TouchableOpacity>
-                                    )}
+                                    )} */}
                                 </View>
                             )}
                         </View>

@@ -17,6 +17,8 @@ import { MainParamList } from "~/navigation/MainNavigator";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import { formatDateRender } from "~/utils/format/format";
+import dayjs from "dayjs";
+import { getAvatarColor, getAvatarLetter } from "~/utils/avatarColors";
 
 const ListUsersShiftScheduleScreen = () => {
 
@@ -66,8 +68,12 @@ const ListUsersShiftScheduleScreen = () => {
             <Pressable
                 style={styles.card}
                 onPress={() => {
-                    navigation.navigate("ShiftSchedule", {
+                    console.log(item.effectiveBeginDate)
+                    const start = dayjs(item.effectiveBeginDate).format("YYYY-MM-DD");
+                    navigation.navigate("ShiftScheduleDepartment", {
                         userId: item.user?.id,
+                        start: start,
+                        // end: end
                     })
 
                 }
@@ -78,9 +84,14 @@ const ListUsersShiftScheduleScreen = () => {
 
                 <View style={styles.header}>
 
-                    <View style={styles.avatar}>
+                    <View
+                        style={[
+                            styles.avatar,
+                            { backgroundColor: getAvatarColor(name) }
+                        ]}
+                    >
                         <Text style={styles.avatarText}>
-                            {name?.charAt(0)}
+                            {getAvatarLetter(name)}
                         </Text>
                     </View>
 

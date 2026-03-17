@@ -89,7 +89,8 @@ export default {
         dontHaveAccount: "Chưa có tài khoản? ",
         signUp: "Đăng ký",
         getStarted: "Bắt đầu ngay",
-        createAccountOrLogin: "Tạo tài khoản hoặc đăng nhập để khám phá ứng dụng của chúng tôi",
+        // createAccountOrLogin: "Tạo tài khoản hoặc đăng nhập để khám phá ứng dụng của chúng tôi",
+        createAccountOrLogin: "Đăng nhập để khám phá ứng dụng của chúng tôi",
         signInWithGoogle: "Đăng nhập với Google",
         signInWithFacebook: "Đăng nhập với Facebook",
         or: "HOẶC",
@@ -135,7 +136,7 @@ export default {
         },
         contact_support: {
             q: "Tôi phải làm sao để liên hệ với nhóm hỗ trợ?",
-            a: "Bạn có thể liên hệ với nhóm hỗ trợ của chúng tôi bằng cách gửi email tới support@example.com.",
+            a: "Bạn có thể liên hệ với nhóm hỗ trợ của chúng tôi bằng cách gửi email tới bbksolution1@gmail.com.",
         },
     },
     theme: {

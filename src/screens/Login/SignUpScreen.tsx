@@ -62,7 +62,7 @@ const SignUpScreen = () => {
             <View style={styles.logoWrap}>
                 {/* <Text style={styles.logo}></Text> */}
                 <Image
-                    source={require('~/assets/images/logo/rnCore-Logo.png')}
+                    source={require('~/assets/images/logo/app-logo-removebg.png')}
                     style={{ width: normalize(200, 'width'), height: normalize(100) }}
                     resizeMode='contain'
                 />

@@ -18,7 +18,7 @@ const SplashScreen = () => {
                 {/* LOGO */}
                 <View style={styles.center}>
                     <Image
-                        source={require('~/assets/images/logo/rnCore-Logo.png')}
+                        source={require('~/assets/images/logo/app-logo-removebg.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />

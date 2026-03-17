@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     View,
     Text,
@@ -7,44 +7,58 @@ import {
     RefreshControl,
     ActivityIndicator
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import holidayApi from "~/api/holiday.api";
+
 import { BaseContent } from "~/components/base-screen/BaseContent";
 import SearchBar from "~/components/search/SearchBar";
 import { useAppColors } from "~/hooks/useAppColors";
+import holidayApi from "~/api/holiday.api";
 import { Holiday } from "~/interface/holiday";
+
 import { PER_PAGE } from "~/utils/common";
-import { addDays, formatDate, formatDateRender } from "~/utils/format/format";
+import { addDays, formatDateRender } from "~/utils/format/format";
+
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const HolidayScreen = () => {
 
+    const colors = useAppColors();
+
+    const [items, setItems] = useState<Holiday[]>([]);
     const [search, setSearch] = useState("");
-    const [items, setItems] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [totalCount, setTotalCount] = useState(0);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [refreshing, setRefreshing] = useState<boolean>(false);
+
     const [page, setPage] = useState(0);
+    const [totalCount, setTotalCount] = useState(0);
 
-    const fetchData = React.useCallback(
-        async (pageIndex = 0, append = false) => {
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
 
-            const res = await holidayApi.getHolidaySettings({
-                skipCount: pageIndex * PER_PAGE,
-                maxResultCount: PER_PAGE,
+    const fetchData = useCallback(async (pageIndex = 0, append = false) => {
 
-            });
+        const res = await holidayApi.getHolidaySettings({
+            skipCount: pageIndex * PER_PAGE,
+            maxResultCount: PER_PAGE
+        });
 
-            const rawItems = res.data.result.items;
+        const result = res.data.result;
 
-            setItems(prev => (append ? [...prev, ...rawItems] : rawItems));
-            setTotalCount(res.data.result.totalCount);
-        },
-        []
-    );
+        setItems(prev =>
+            append ? [...prev, ...result.items] : result.items
+        );
+
+        setTotalCount(result.totalCount);
+
+    }, []);
 
     useEffect(() => {
-        fetchData();
+
+        const init = async () => {
+            await fetchData(0);
+            setLoading(false);
+        };
+
+        init();
+
     }, []);
 
     const filteredData = useMemo(() => {
@@ -53,132 +67,254 @@ const HolidayScreen = () => {
 
         const keyword = search.toLowerCase();
 
-        return items.filter((item: Holiday) =>
+        return items.filter(item =>
             item.title?.toLowerCase().includes(keyword)
         );
 
-    }, [search, items]);
+    }, [items, search]);
 
     const onRefresh = async () => {
+
         setRefreshing(true);
+
         setPage(0);
-        await fetchData();
+
+        await fetchData(0);
+
         setRefreshing(false);
+
     };
 
-    // 🔹 Load more
     const loadMore = async () => {
+
         if (loadingMore) return;
+
         if (items.length >= totalCount) return;
 
-        setLoadingMore(true);
         const nextPage = page + 1;
+
+        setLoadingMore(true);
+
         setPage(nextPage);
+
         await fetchData(nextPage, true);
-        //await fetchData();
+
         setLoadingMore(false);
+
     };
 
+    const renderItem = useCallback(({ item }: { item: Holiday }) => {
 
-    const renderItem = ({ item }: { item: Holiday }) => (
-        <View style={styles.card}>
+        const endDate =
+            item.numberOfDays > 1
+                ? addDays(item.startTime, item.numberOfDays - 1)
+                : null;
 
-            <Text style={styles.name}>
-                {item.title}
-            </Text>
+        return (
 
-            <Text style={styles.date}>
-                {item.numberOfDays > 1
-                    ? `${formatDateRender(item.startTime, "dd/MM")} - ${formatDateRender(
-                        addDays(item.startTime, item.numberOfDays - 1),
-                        "dd/MM/yyyy"
-                    )}`
-                    : formatDateRender(item.startTime, "dd/MM/yyyy")}
-            </Text>
+            <View style={[styles.card, { backgroundColor: colors.card }]}>
 
-            <Text style={styles.days}>
-                {item.numberOfDays} ngày nghỉ
-            </Text>
+                <View style={styles.row}>
+
+                    <View style={styles.iconBox}>
+                        <Ionicons name="calendar-outline" size={20} color="#2563EB" />
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+
+                        <Text style={[styles.title, { color: colors.text }]}>
+                            {item.title}
+                        </Text>
+
+                        <Text style={styles.date}>
+                            {endDate
+                                ? `${formatDateRender(item.startTime, "dd/MM")} - ${formatDateRender(
+                                    endDate,
+                                    "dd/MM/yyyy"
+                                )}`
+                                : formatDateRender(item.startTime, "dd/MM/yyyy")}
+                        </Text>
+
+                    </View>
+
+                    <View style={styles.badge}>
+                        <Text style={styles.badgeText}>
+                            {item.numberOfDays} ngày
+                        </Text>
+                    </View>
+
+                </View>
+
+            </View>
+
+        );
+
+    }, [colors]);
+
+    const renderHeader = () => (
+
+        <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
+
+            <SearchBar
+                value={search}
+                onChange={setSearch}
+                placeholder="Tìm kỳ nghỉ..."
+            />
 
         </View>
+
     );
 
-    return (
-        <BaseContent >
-            <View style={styles.container} >
-                <SearchBar
-                    value={search}
-                    onChange={setSearch}
-                    placeholder="Tìm kỳ nghỉ..."
-                />
+    const renderFooter = () => {
+
+        if (!loadingMore) return null;
+
+        return (
+            <View style={{ paddingVertical: 20 }}>
+                <ActivityIndicator />
             </View>
+        );
+
+    };
+
+    if (loading) {
+        return (
+            <BaseContent>
+                <View style={styles.center}>
+                    <ActivityIndicator size="large" />
+                </View>
+            </BaseContent>
+        );
+    }
+
+    return (
+
+        <BaseContent>
+
             <FlatList
                 data={filteredData}
-                keyExtractor={(item) => item.id}
+
+                keyExtractor={(item) => item.id.toString()}
+
                 renderItem={renderItem}
-                contentContainerStyle={{ padding: 14, paddingTop: 0 }}
-                showsVerticalScrollIndicator={false}
+
+                ListHeaderComponent={renderHeader}
+
+                stickyHeaderIndices={[0]}
+
+                contentContainerStyle={styles.list}
+
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
                     />
                 }
+
                 onEndReached={loadMore}
                 onEndReachedThreshold={0.3}
-                ListFooterComponent={
-                    loadingMore ? (
-                        <View style={{ paddingVertical: 16 }}>
-                            <ActivityIndicator />
-                        </View>
-                    ) : null
+
+                ListFooterComponent={renderFooter}
+
+                ListEmptyComponent={
+                    <View style={styles.empty}>
+                        <Ionicons name="calendar-outline" size={40} color="#94a3b8" />
+                        <Text style={styles.emptyText}>
+                            Không có kỳ nghỉ
+                        </Text>
+                    </View>
                 }
+
             />
 
         </BaseContent>
+
     );
+
 };
 
 export default HolidayScreen;
 
 const styles = StyleSheet.create({
 
-    container: {
+    searchContainer: {
         padding: 14,
-        paddingBottom: 0,
+        paddingHorizontal: 0,
+        paddingBottom: 10
     },
 
-    title: {
-        fontSize: 20,
-        fontWeight: "700",
-        paddingHorizontal: 20,
-        marginTop: 10
+    list: {
+        paddingHorizontal: 14,
+        paddingBottom: 30
     },
 
     card: {
-        backgroundColor: "#fff",
-        padding: 18,
-        borderRadius: 12,
-        marginBottom: 14,
+        padding: 16,
+        borderRadius: 14,
+        marginBottom: 12,
+
+        shadowColor: "#000",
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
+
         elevation: 2
     },
 
-    name: {
+    row: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+
+    iconBox: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: "#EFF6FF",
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 12
+    },
+
+    title: {
         fontSize: 16,
-        fontWeight: "600",
-        marginBottom: 6
+        fontWeight: "600"
     },
 
     date: {
-        fontSize: 14,
+        marginTop: 3,
+        fontSize: 13,
         color: "#64748B"
     },
 
-    days: {
+    badge: {
+        backgroundColor: "#DCFCE7",
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20
+    },
+
+    badgeText: {
+        color: "#16A34A",
+        fontSize: 12,
+        fontWeight: "600"
+    },
+
+    empty: {
+        alignItems: "center",
+        marginTop: 80
+    },
+
+    emptyText: {
         marginTop: 8,
         fontSize: 14,
-        fontWeight: "500",
-        color: "#16a34a"
+        color: "#94a3b8"
+    },
+
+    center: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
     }
 
 });

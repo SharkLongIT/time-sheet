@@ -29,6 +29,9 @@ const authSlice = createSlice({
         setRememberMe: (state, action: PayloadAction<boolean>) => {
             state.rememberMe = action.payload;
         },
+        setUser: (state, action: PayloadAction<UserInfo>) => {
+            state.user = action.payload;
+        }
     },
     extraReducers: builder => {
         builder
@@ -74,4 +77,4 @@ const authSlice = createSlice({
 });
 
 export default authSlice.reducer;
-export const { setRememberMe } = authSlice.actions;
+export const { setRememberMe, setUser } = authSlice.actions;

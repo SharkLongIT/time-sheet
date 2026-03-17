@@ -30,22 +30,9 @@ export const loginThunk = createAsyncThunk<
 >(LOGIN, async (data, { dispatch, rejectWithValue }) => {
     try {
         const res = await authApi.login(data);
-        console.log(res)
         const token = res.data.result.accessToken;
-
-        // if (data.rememberClient) {
-        //     await AsyncStorage.setItem(StorageEnum.ACCESS_TOKEN, res.data.result.accessToken);
-        // }
         await setData(StorageEnum.ACCESS_TOKEN, token);
-        // await Keychain.setGenericPassword(
-        //     'refreshToken',
-        //     res.data.result.refreshToken
-        // );
-
-        // apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
-
         await dispatch(handleGetUser()).unwrap();
-
         return res.data.result;
     } catch (error) {
         return rejectWithValue(error);

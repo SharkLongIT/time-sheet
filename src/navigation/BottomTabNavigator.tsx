@@ -118,6 +118,11 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
 export default function BottomTabNavigator() {
     const { t } = useTranslation();
     const { items } = useNotifications();
+    useEffect(() => {
+        const resPermission = async () => {
+
+        }
+    })
     return (
         <Tab.Navigator
             tabBar={(props) => <CustomTabBar {...props} />}

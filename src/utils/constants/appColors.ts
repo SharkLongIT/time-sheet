@@ -19,7 +19,7 @@ export const lightColors = {
   background: '#F5F7FA',
   card: '#FFFFFF',
   cardPressed: '#F1F5F9',
-
+  text: '#111827',
   // text
   textPrimary: '#111827',
   textSecondary: '#6B7280',
@@ -49,6 +49,7 @@ export const darkColors = {
   background: '#0F172A',
   card: '#1E293B',
   cardPressed: '#334155',
+  text: '#F8FAFC',
 
   // text
   textPrimary: '#F8FAFC',
