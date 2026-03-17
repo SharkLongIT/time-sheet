@@ -22,17 +22,21 @@ const DraftTab = () => {
 
     const fetchData = React.useCallback(
         async (pageIndex = 0, append = false) => {
+            try {
+                const res = await leaveRequestUserApi.getAllLeaveRequest({
+                    status: 0,
+                    skipCount: pageIndex * PER_PAGE,
+                    maxResultCount: PER_PAGE,
 
-            const res = await leaveRequestUserApi.getAllLeaveRequest({
-                status: 0,
-                skipCount: pageIndex * PER_PAGE,
-                maxResultCount: PER_PAGE,
+                });
 
-            });
+                const rawItems = res.data.result.items;
+                setItems(prev => (append ? [...prev, ...rawItems] : rawItems));
+                setTotalCount(res.data.result.totalCount);
+            } catch (error: any) {
 
-            const rawItems = res.data.result.items;
-            setItems(prev => (append ? [...prev, ...rawItems] : rawItems));
-            setTotalCount(res.data.result.totalCount);
+            }
+
         },
         []
     );

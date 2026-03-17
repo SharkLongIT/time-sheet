@@ -19,6 +19,7 @@ const DatePickerField = ({
     onChange,
     minDate,
     maxDate,
+    error
 }: any) => {
     const [visible, setVisible] = useState(false);
     const [tempDate, setTempDate] = useState<Date>(value || new Date());
@@ -38,7 +39,7 @@ const DatePickerField = ({
             {/* INPUT */}
             <TouchableOpacity
                 onPress={() => setVisible(true)}
-                style={styles.input}
+                style={[styles.input, error && styles.errorBorder]}
             >
                 <Text style={{ color: value ? "#000" : "#9CA3AF" }}>
                     {value
@@ -46,6 +47,7 @@ const DatePickerField = ({
                         : label}
                 </Text>
             </TouchableOpacity>
+            {error && <Text style={styles.errorText}>{error}</Text>}
 
             {/* MODAL */}
             <Modal
@@ -156,5 +158,16 @@ const styles = StyleSheet.create({
         color: "#2563EB",
         fontSize: 16,
         fontWeight: "600",
+    },
+    errorBorder: {
+        borderColor: '#EF4444',
+    },
+    errorText: {
+        marginTop: 4,
+        fontSize: 12,
+        color: '#EF4444',
+    },
+    required: {
+        color: '#EF4444',
     },
 });

@@ -56,7 +56,6 @@ const authSlice = createSlice({
             .addCase(loginThunk.fulfilled, (state, action) => {
                 // state.user = action.payload;
                 state.loading = false;
-                console.log('loginThunk.fulfilled', action.payload);
                 state.token = action.payload.accessToken;
             })
             .addCase(handleGetUser.fulfilled, (state, action: PayloadAction<CurrentLoginInfo>) => {

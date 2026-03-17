@@ -22,6 +22,7 @@ import Weather from "~/components/weather/Weather";
 import { useAppColors } from "~/hooks/useAppColors";
 import { RootState } from "~/redux/store";
 import DateRangePicker from "~/components/date-picker/DateRangePicker";
+import { alertError } from "~/utils/alertMessageServer";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -54,8 +55,8 @@ const HomeScreen = () => {
             setSummary(res.data.result);
 
         } catch (error) {
-
             console.log(error);
+            alertError(error)
 
         } finally {
 
@@ -75,6 +76,7 @@ const HomeScreen = () => {
     const leaveEarlyCount = summary?.totalEarlyLeaveDays ?? 0;
     const absentCount = summary?.totalAbsentDays ?? 0;
     const leaveRequests = summary?.totalLeaveRequests ?? 0;
+    const lateAndEarlyCount = summary?.totalLateAndEarlyLeave ?? 0;
 
     const MenuButton = ({ icon, color, label, onPress }: any) => (
         <Pressable style={styles.menuItem} onPress={onPress}>
@@ -89,6 +91,20 @@ const HomeScreen = () => {
 
         </Pressable>
     )
+    const Stat = ({ label, value, color }: { label: any, value: any, color: any }) => (
+        <View
+            style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                padding: 12,
+                borderRadius: 10,
+                backgroundColor: "#F9FAFB"
+            }}
+        >
+            <Text>{label}</Text>
+            <Text style={{ color, fontWeight: "700" }}>{value}</Text>
+        </View>
+    );
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
 
@@ -132,47 +148,6 @@ const HomeScreen = () => {
                     </View>
 
 
-
-
-                    {/* DASHBOARD CARDS */}
-
-                    {/* <View style={styles.dashboardRow}>
-
-                        <View style={[styles.statCard, { borderLeftColor: "#22c55e" }]}>
-
-                            <Ionicons name="calendar-outline" size={26} color="#22c55e" />
-
-                            <Text style={styles.cardTitle}>Ngày công</Text>
-
-                            <Text style={styles.bigNumber}>
-                                {totalAttendance}
-                            </Text>
-
-                            <Text style={styles.small}>Tổng tháng: {maxAttendance}</Text>
-                            <Text style={styles.small}>Không phép: {absentCount}</Text>
-                            <Text style={styles.small}>Có phép: {leaveRequests}</Text>
-
-                        </View>
-
-
-                        <View style={[styles.statCard, { borderLeftColor: "#3b82f6" }]}>
-
-                            <Ionicons name="airplane-outline" size={26} color="#3b82f6" />
-
-                            <Text style={styles.cardTitle}>Ngày phép</Text>
-
-                            <Text style={styles.bigNumber}>
-                                {remainingLeave}
-                            </Text>
-
-                            <Text style={styles.small}>Phép năm: {totalAnnualLeave}</Text>
-                            <Text style={styles.small}>Đã nghỉ: {usedLeave}</Text>
-
-                        </View>
-
-                    </View> */}
-
-
                     {/* CHART */}
 
                     <View style={styles.chartCard}>
@@ -193,7 +168,7 @@ const HomeScreen = () => {
                         />
 
                         <Text style={styles.sectionTitle}>
-                            Biểu đồ chấm công
+                            Thông tin chấm công
                         </Text>
                         {loading ? (
 
@@ -202,31 +177,64 @@ const HomeScreen = () => {
                             </View>
 
                         ) : (
-                            <BarChart
-                                data={{
-                                    labels: ["Vắng", "Muộn", "Về sớm", "Nghỉ"],
-                                    datasets: [{
-                                        data: [
-                                            absentCount,
-                                            lateCount,
-                                            leaveEarlyCount,
-                                            leaveRequests
-                                        ]
-                                    }]
-                                }}
-                                yAxisLabel=""
-                                yAxisSuffix=""
-                                width={screenWidth - 40}
-                                height={200}
-                                chartConfig={{
-                                    backgroundGradientFrom: "#fff",
-                                    backgroundGradientTo: "#fff",
-                                    decimalPlaces: 0,
-                                    color: (o = 1) => `rgba(59,130,246,${o})`,
-                                    labelColor: () => "#374151"
-                                }}
-                                style={{ marginTop: 10, borderRadius: 12 }}
-                            />
+                            // <BarChart
+                            //     data={{
+                            //         labels: ["Vắng", "Muộn", "Về sớm", "Nghỉ phép"],
+                            //         datasets: [{
+                            //             data: [
+                            //                 absentCount,
+                            //                 lateCount,
+                            //                 leaveEarlyCount,
+                            //                 leaveRequests,
+                            //             ],
+                            //             colors: [
+                            //                 () => "#EF4444",  // đỏ
+                            //                 () => "#F59E0B", // cam
+                            //                 () => "#6366F1", // tím
+                            //                 () => "#22C55E", // xanh lá
+                            //             ]
+                            //         }]
+                            //     }}
+                            //     width={screenWidth - 40}
+                            //     height={260}
+                            //     fromZero
+                            //     showValuesOnTopOfBars
+                            //     withCustomBarColorFromData
+                            //     flatColor
+                            //     verticalLabelRotation={0}
+                            //     chartConfig={{
+                            //         backgroundGradientFrom: "#ffffff",
+                            //         backgroundGradientTo: "#ffffff",
+                            //         decimalPlaces: 0,
+
+                            //         barPercentage: 0.5,
+
+                            //         color: () => "#3B82F6",
+                            //         labelColor: () => "#111827",
+
+                            //         propsForLabels: {
+                            //             fontSize: 12
+                            //         },
+
+                            //         propsForBackgroundLines: {
+                            //             stroke: "#E5E7EB",
+                            //             strokeDasharray: "4"
+                            //         }
+                            //     }}
+                            //     style={{
+                            //         marginVertical: 10,
+                            //         borderRadius: 16
+                            //     }}
+                            //     yAxisLabel=""
+                            //     yAxisSuffix=""
+                            // />
+                            <View style={{ gap: 10 }}>
+                                <Stat label="Vắng" value={absentCount} color="#EF4444" />
+                                <Stat label="Đi muộn" value={lateCount} color="#F59E0B" />
+                                <Stat label="Về sớm" value={leaveEarlyCount} color="#3B82F6" />
+                                <Stat label="Nghỉ phép" value={leaveRequests} color="#22C55E" />
+                                <Stat label="Đi muộn về sớm" value={lateAndEarlyCount} color="#8B5CF6" />
+                            </View>
                         )}
 
                     </View>

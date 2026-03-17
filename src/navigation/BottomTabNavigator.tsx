@@ -6,6 +6,7 @@ import {
     StyleSheet,
     Animated,
     Dimensions,
+    Pressable,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -31,6 +32,9 @@ import MenuScreen from '~/screens/menu/MenuScreen';
 import { useNotifications } from '~/hooks/useNotifications';
 import HomeManagerScreen from '~/screens/home/HomeManagerScreen';
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { Permissions } from '~/permissions/permissions';
+import { isGranted } from '~/helper/permission';
+import { showToast } from '~/utils/toast';
 
 /* -------------------- Types -------------------- */
 export type BottomTabParamList = {
@@ -117,12 +121,11 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
 /* -------------------- Navigator -------------------- */
 export default function BottomTabNavigator() {
     const { t } = useTranslation();
-    const { items } = useNotifications();
-    useEffect(() => {
-        const resPermission = async () => {
-
-        }
-    })
+    const { totalCount } = useNotifications();
+    // const isDashboardDepartment = isGranted(
+    //     Permissions.Pages_Hrm_Administration_DashboardDepartment
+    // );
+    // console.log(canCreateLeave)
     return (
         <Tab.Navigator
             tabBar={(props) => <CustomTabBar {...props} />}
@@ -142,7 +145,6 @@ export default function BottomTabNavigator() {
                     ),
                 }}
             />
-
             <Tab.Screen
                 name="HomeManager"
                 component={HomeManagerScreen}
@@ -154,7 +156,7 @@ export default function BottomTabNavigator() {
                             size={22}
                             color={focused ? appColors.hight_light : "#9CA3AF"}
                         />
-                    ),
+                    )
                 }}
             />
             <Tab.Screen
@@ -169,11 +171,10 @@ export default function BottomTabNavigator() {
                                 size={24}
                                 color={focused ? appColors.hight_light : "#9CA3AF"}
                             />
-
-                            {items.length > 0 && (
+                            {totalCount > 0 && (
                                 <View style={styles.badge}>
                                     <Text style={styles.badgeText}>
-                                        {items.length > 99 ? "99+" : items.length}
+                                        {totalCount > 99 ? "99+" : totalCount}
                                     </Text>
                                 </View>
                             )}

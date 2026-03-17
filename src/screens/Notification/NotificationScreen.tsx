@@ -53,7 +53,7 @@ const NotificationScreen = () => {
 
         return (
             <GestureHandlerRootView>
-                <Swipeable
+                {/* <Swipeable
                     renderLeftActions={renderLeftActions}
                     renderRightActions={renderRightActions}
                     overshootRight={false}
@@ -66,30 +66,30 @@ const NotificationScreen = () => {
                         // TODO: handle mark as read
                         // console.log("READ", item.id);
                     }}
+                > */}
+                <View
+                    style={[styles.card, {
+                        backgroundColor: colors.card,
+                        borderLeftColor: notiColor.border,
+                        borderLeftWidth: 4,
+                    },
+                    ]}
                 >
-                    <View
-                        style={[styles.card, {
-                            backgroundColor: colors.card,
-                            borderLeftColor: notiColor.border,
-                            borderLeftWidth: 4,
-                        },
-                        ]}
-                    >
-                        {/* DOT */}
-                        <View style={[styles.dot, { backgroundColor: notiColor.dot }]} />
-                        <View style={{ flex: 1 }}>
-                            <Text style={[styles.title, { color: colors.textPrimary }]}>
-                                {item.title}
-                            </Text>
-                            <Text style={[styles.content, { color: colors.textSecondary },]}>
-                                {item.content}
-                            </Text>
-                            <Text style={[styles.time, { color: colors.textSecondary },]} >
-                                {formatDateRender(item.time, "dd/MM/yyyy")}
-                            </Text>
-                        </View>
+                    {/* DOT */}
+                    <View style={[styles.dot, { backgroundColor: notiColor.dot }]} />
+                    <View style={{ flex: 1 }}>
+                        <Text style={[styles.title, { color: colors.textPrimary }]}>
+                            {item.title}
+                        </Text>
+                        <Text style={[styles.content, { color: colors.textSecondary },]}>
+                            {item.content}
+                        </Text>
+                        <Text style={[styles.time, { color: colors.textSecondary },]} >
+                            {formatDateRender(item.time, "dd/MM/yyyy")}
+                        </Text>
                     </View>
-                </Swipeable>
+                </View>
+                {/* </Swipeable> */}
             </GestureHandlerRootView>
         );
     };
@@ -100,7 +100,8 @@ const NotificationScreen = () => {
             <HeaderMain title={t("notification.title")} />
 
             {loading ? (
-                <NotificationSkeleton />
+                // <NotificationSkeleton />
+                <ActivityIndicator color={colors.primary} />
             ) : (
                 <Animated.View style={{ flex: 1, opacity }}>
                     <FlatList

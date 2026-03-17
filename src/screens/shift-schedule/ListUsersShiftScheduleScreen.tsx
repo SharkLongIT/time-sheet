@@ -19,6 +19,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { formatDateRender } from "~/utils/format/format";
 import dayjs from "dayjs";
 import { getAvatarColor, getAvatarLetter } from "~/utils/avatarColors";
+import { alertError } from "~/utils/alertMessageServer";
 
 const ListUsersShiftScheduleScreen = () => {
 
@@ -38,8 +39,9 @@ const ListUsersShiftScheduleScreen = () => {
 
                 setUsers(res.data.result.items);
 
-            } catch (err) {
+            } catch (err: any) {
                 console.log(err);
+                alertError(err)
             }
 
         };
@@ -68,7 +70,6 @@ const ListUsersShiftScheduleScreen = () => {
             <Pressable
                 style={styles.card}
                 onPress={() => {
-                    console.log(item.effectiveBeginDate)
                     const start = dayjs(item.effectiveBeginDate).format("YYYY-MM-DD");
                     navigation.navigate("ShiftScheduleDepartment", {
                         userId: item.user?.id,

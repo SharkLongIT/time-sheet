@@ -79,7 +79,7 @@ android {
 
     namespace "com.rncore"
     defaultConfig {
-        applicationId "com.rncore"
+        applicationId "com.bbksolution.timesheet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -92,6 +92,13 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+        storeFile file(BBK_UPLOAD_STORE_FILE)
+        storePassword BBK_UPLOAD_STORE_PASSWORD
+        keyAlias BBK_UPLOAD_KEY_ALIAS
+        keyPassword BBK_UPLOAD_KEY_PASSWORD
+    }
+
     }
     buildTypes {
         debug {
@@ -100,7 +107,8 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            //signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

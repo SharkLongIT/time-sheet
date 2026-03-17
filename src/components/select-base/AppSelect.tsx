@@ -19,9 +19,10 @@ interface AppSelectProps {
     value?: string | null;
     options: Option[];
     placeholder?: string;
-    onChange: (value: string) => void;
+    onChange?: (value: string) => void;
     error?: string;
     required?: boolean;
+    disabled?: boolean;
 }
 
 const AppSelect: React.FC<AppSelectProps> = ({
@@ -32,14 +33,13 @@ const AppSelect: React.FC<AppSelectProps> = ({
     onChange,
     error,
     required,
+    disabled
 }) => {
     const [visible, setVisible] = useState(false);
 
     const selected = options.find(item => item.value === value);
     return (
         <View style={{ marginBottom: 16 }}>
-            {/* {required && <Text style={{ color: '#EF4444' }}>* </Text>}
-            {label && <Text style={styles.label}>{label} </Text>} */}
             {label && (
                 <Text style={styles.label}>
                     {label}
@@ -47,14 +47,23 @@ const AppSelect: React.FC<AppSelectProps> = ({
                 </Text>
             )}
             <TouchableOpacity
-                style={[styles.selectBox, error && styles.errorBorder]}
-                onPress={() => setVisible(true)}
+                style={[
+                    styles.selectBox,
+                    error && styles.errorBorder
+                ]}
+                disabled={disabled}
+                onPress={() => {
+                    if (disabled) return;
+                    setVisible(true);
+                }}
             >
                 <Text style={{ color: selected ? '#111827' : '#9CA3AF' }}>
                     {selected ? selected.label : placeholder}
                 </Text>
+
                 <Text style={styles.arrow}>▼</Text>
             </TouchableOpacity>
+
 
             {error && <Text style={styles.errorText}>{error}</Text>}
 
@@ -71,7 +80,7 @@ const AppSelect: React.FC<AppSelectProps> = ({
                                         item.value === value && styles.selectedOption,
                                     ]}
                                     onPress={() => {
-                                        onChange(item.value);
+                                        onChange?.(item.value);
                                         setVisible(false);
                                     }}
                                 >
@@ -146,4 +155,5 @@ const styles = StyleSheet.create({
     required: {
         color: '#EF4444',
     },
+
 });

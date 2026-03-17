@@ -2,11 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import apiClient from "~/api/apiClient";
 import authApi from "~/api/auth.api";
+import permissionApi from "~/api/permission.api";
 import { CurrentLoginInfo, ILoginPayload, IResponseLogin } from "~/interface/auth";
+import PermissionService from "~/permissions/PermissionService";
 import { LOGIN } from "~/utils/constants/actionType";
 import { StorageEnum } from "~/utils/enum";
 import { setData } from "~/utils/helper/storage";
-import * as Keychain from 'react-native-keychain';
 
 export const checkAuth = createAsyncThunk(
     'auth/checkAuth',
@@ -33,6 +34,10 @@ export const loginThunk = createAsyncThunk<
         const token = res.data.result.accessToken;
         await setData(StorageEnum.ACCESS_TOKEN, token);
         await dispatch(handleGetUser()).unwrap();
+
+        const resPermission = await permissionApi.getMyPermissions();
+        await PermissionService.savePermissions(resPermission.data.result);
+
         return res.data.result;
     } catch (error) {
         return rejectWithValue(error);

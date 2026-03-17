@@ -451,6 +451,7 @@ import AttendanceDetailModal from "./modal/AttendanceDetailModal";
 import { useRoute } from "@react-navigation/native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import { getAvatarColor, getAvatarLetter } from "~/utils/avatarColors";
+import { alertError } from "~/utils/alertMessageServer";
 
 /* ---------------- LOCALE ---------------- */
 
@@ -566,6 +567,7 @@ const AttendanceCalendarScreen = () => {
         } catch (err) {
 
             console.log(err);
+            alertError(err)
 
         } finally {
 

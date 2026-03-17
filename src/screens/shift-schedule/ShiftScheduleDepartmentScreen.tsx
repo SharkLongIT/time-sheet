@@ -20,6 +20,7 @@ import { daysOfWeek, formatDateRender } from "~/utils/format/format";
 import { useRoute } from "@react-navigation/native";
 import { getUserById } from "~/hooks/useAuth";
 import { getAvatarColor, getAvatarLetter } from "~/utils/avatarColors";
+import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 
 /* ---------------- LOCALE ---------------- */
 
@@ -229,171 +230,176 @@ const ShiftScheduleDepartmentScreen = () => {
     /* ---------------- UI ---------------- */
 
     return (
+        <GestureHandlerRootView>
+            <ScrollView
+                contentContainerStyle={{ paddingBottom: 40 }}
+                showsVerticalScrollIndicator={false}
+                style={styles.container}>
 
-        <View style={styles.container}>
+                {/* USER */}
 
-            {/* USER */}
+                <View style={styles.userCard}>
 
-            <View style={styles.userCard}>
+                    <View
+                        style={[
+                            styles.avatar,
+                            { backgroundColor: getAvatarColor(user?.name) }
+                        ]}
+                    >
+                        <Text style={styles.avatarText}>
+                            {getAvatarLetter(user?.name)}
+                        </Text>
+                    </View>
+                    <View>
 
-                <View
-                    style={[
-                        styles.avatar,
-                        { backgroundColor: getAvatarColor(user?.name) }
-                    ]}
-                >
-                    <Text style={styles.avatarText}>
-                        {getAvatarLetter(user?.name)}
-                    </Text>
+                        <Text style={styles.userName}>
+                            {user?.name}
+                        </Text>
+
+                        <Text style={styles.userEmail}>
+                            {user?.emailAddress}
+                        </Text>
+
+                    </View>
+
                 </View>
-                <View>
 
-                    <Text style={styles.userName}>
-                        {user?.name}
-                    </Text>
+                {/* SHIFT LIST */}
 
-                    <Text style={styles.userEmail}>
-                        {user?.emailAddress}
-                    </Text>
+                <View >
 
-                </View>
+                    {stats?.shiftList?.length ? (
 
-            </View>
+                        stats.shiftList.map((shift: any, index: number) => {
 
-            {/* SHIFT LIST */}
+                            const {
+                                id,
+                                shiftName,
+                                isShiftScheduleUser,
+                                effectiveBeginDate,
+                                effectiveEndDate,
+                                attendanceRuleMode
+                            } = shift;
 
-            <View >
+                            const cardColor =
+                                isShiftScheduleUser ? "#605DFF" : "#ffbc2b";
 
-                {stats?.shiftList?.length ? (
+                            const textColor =
+                                isShiftScheduleUser ? "#fff" : "#1e293b";
 
-                    stats.shiftList.map((shift: any, index: number) => {
+                            const attendanceModes: any = {
+                                0: "Đầu ngày & cuối ngày",
+                                4: "Đầu ca và cuối ca",
+                                3: "Cả ngày",
+                                "-1": "Chưa có lịch làm việc"
+                            };
 
-                        const {
-                            id,
-                            shiftName,
-                            isShiftScheduleUser,
-                            effectiveBeginDate,
-                            effectiveEndDate,
-                            attendanceRuleMode
-                        } = shift;
+                            const modeText =
+                                attendanceModes[attendanceRuleMode] ?? "";
 
-                        const cardColor =
-                            isShiftScheduleUser ? "#605DFF" : "#ffbc2b";
+                            return (
 
-                        const textColor =
-                            isShiftScheduleUser ? "#fff" : "#1e293b";
+                                <Pressable
+                                    key={index}
+                                    style={[styles.shiftCard, { backgroundColor: cardColor }]}
+                                    onPress={() => {
+                                        setShiftId(id);
+                                        setModalDetailVisible(true);
+                                    }}
+                                >
 
-                        const attendanceModes: any = {
-                            0: "Đầu ngày & cuối ngày",
-                            4: "Đầu ca và cuối ca",
-                            3: "Cả ngày",
-                            "-1": "Chưa có lịch làm việc"
-                        };
-
-                        const modeText =
-                            attendanceModes[attendanceRuleMode] ?? "";
-
-                        return (
-
-                            <Pressable
-                                key={index}
-                                style={[styles.shiftCard, { backgroundColor: cardColor }]}
-                                onPress={() => {
-                                    setShiftId(id);
-                                    setModalDetailVisible(true);
-                                }}
-                            >
-
-                                <Text style={[styles.shiftTitle, { color: textColor }]}>
-                                    ⏰ {shiftName} ({isShiftScheduleUser ? "Lịch cá nhân" : "Lịch nhóm"})
-                                </Text>
-
-                                <Text style={[styles.shiftDate, { color: textColor }]}>
-                                    📅 {formatDateRender(effectiveBeginDate, "dd/MM/yyyy")} -{" "}
-                                    {formatDateRender(effectiveEndDate, "dd/MM/yyyy")}
-                                </Text>
-
-                                {!!modeText && (
-
-                                    <Text style={[styles.shiftDate, { color: textColor }]}>
-                                        Phương thức tính công: {modeText}
+                                    <Text style={[styles.shiftTitle, { color: textColor }]}>
+                                        ⏰ {shiftName} ({isShiftScheduleUser ? "Lịch cá nhân" : "Lịch nhóm"})
                                     </Text>
 
-                                )}
+                                    <Text style={[styles.shiftDate, { color: textColor }]}>
+                                        📅 {formatDateRender(effectiveBeginDate, "dd/MM/yyyy")} -{" "}
+                                        {formatDateRender(effectiveEndDate, "dd/MM/yyyy")}
+                                    </Text>
 
-                            </Pressable>
+                                    {!!modeText && (
 
-                        );
+                                        <Text style={[styles.shiftDate, { color: textColor }]}>
+                                            Phương thức tính công: {modeText}
+                                        </Text>
 
-                    })
+                                    )}
+
+                                </Pressable>
+
+                            );
+
+                        })
+
+                    ) : (
+
+                        <View style={styles.emptyCard}>
+
+                            <Text style={styles.emptyText}>
+                                Không có ca nào trong tháng
+                            </Text>
+
+                        </View>
+
+                    )}
+
+                </View>
+
+                {/* CALENDAR */}
+
+                {loading ? (
+
+                    <ActivityIndicator size="large" style={{ marginTop: 40 }} />
 
                 ) : (
 
-                    <View style={styles.emptyCard}>
+                    <View style={styles.calendarCard}>
 
-                        <Text style={styles.emptyText}>
-                            Không có ca nào trong tháng
-                        </Text>
+                        <Calendar
+                            current={currentMonth}
+                            dayComponent={renderDay}
+                            onMonthChange={onMonthChange}
+                            enableSwipeMonths
+                            firstDay={1}
+                            renderArrow={(direction) => (
+                                <Ionicons
+                                    name={direction === "left" ? "chevron-back" : "chevron-forward"}
+                                    size={22}
+                                    color="#2563eb"
+                                />
+                            )}
+                            theme={{
+                                todayTextColor: "#2563eb",
+                                arrowColor: "#2563eb",
+                                dayTextColor: "#1e293b",
+                                monthTextColor: "#111827",
+                                textMonthFontWeight: "700",
+                                textDayFontSize: 14,
+                                textMonthFontSize: 18
+                            }}
+                        />
 
                     </View>
 
                 )}
 
-            </View>
+                {/* MODAL */}
 
-            {/* CALENDAR */}
+                <ShiftScheduleModal
+                    visible={visible}
+                    onClose={() => setVisible(false)}
+                    selectedEvent={selectedEvent}
+                />
 
-            {loading ? (
+                <ShiftDetailUserModal
+                    visible={modalDetailVisible}
+                    onClose={() => setModalDetailVisible(false)}
+                    shiftId={shiftId}
+                />
 
-                <ActivityIndicator size="large" style={{ marginTop: 40 }} />
+            </ScrollView>
+        </GestureHandlerRootView>
 
-            ) : (
-
-                <View style={styles.calendarCard}>
-
-                    <Calendar
-                        current={currentMonth}
-                        dayComponent={renderDay}
-                        onMonthChange={onMonthChange}
-                        enableSwipeMonths
-                        firstDay={1}
-                        renderArrow={(direction) => (
-                            <Ionicons
-                                name={direction === "left" ? "chevron-back" : "chevron-forward"}
-                                size={22}
-                                color="#2563eb"
-                            />
-                        )}
-                        theme={{
-                            todayTextColor: "#2563eb",
-                            arrowColor: "#2563eb",
-                            dayTextColor: "#1e293b",
-                            monthTextColor: "#111827",
-                            textMonthFontWeight: "700",
-                            textDayFontSize: 14,
-                            textMonthFontSize: 18
-                        }}
-                    />
-
-                </View>
-
-            )}
-
-            {/* MODAL */}
-
-            <ShiftScheduleModal
-                visible={visible}
-                onClose={() => setVisible(false)}
-                selectedEvent={selectedEvent}
-            />
-
-            <ShiftDetailUserModal
-                visible={modalDetailVisible}
-                onClose={() => setModalDetailVisible(false)}
-                shiftId={shiftId}
-            />
-
-        </View>
 
     );
 
@@ -411,7 +417,7 @@ const styles = StyleSheet.create({
 
     userCard: {
         backgroundColor: "#fff",
-        margin: 16,
+        margin: 14,
         padding: 16,
         borderRadius: 14,
         flexDirection: "row",

@@ -31,17 +31,17 @@ const OnBoardingScreen = () => {
                 <View style={styles.bottomContent}>
                     {/* TEXT */}
                     <View style={styles.textBlock}>
-                        <Text style={styles.welcome}>Welcome</Text>
+                        <Text style={styles.welcome}>Chào mừng</Text>
 
                         <Text style={styles.description}>
-                            Build faster. Stay focused.
-                            {"\n"}Your workflow starts here.
+                            Theo dõi chấm công và quản lý công việc
+                            {"\n"}một cách nhanh chóng và hiệu quả.
                         </Text>
                     </View>
 
                     {/* ACTION */}
                     <View style={styles.continueRow}>
-                        <Text style={styles.continueText}>Continue</Text>
+                        <Text style={styles.continueText}>Bắt đầu</Text>
                         <ContinueIcon />
                     </View>
                 </View>

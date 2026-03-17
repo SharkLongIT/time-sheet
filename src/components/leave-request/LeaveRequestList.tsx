@@ -25,6 +25,7 @@ import { LeaveRequest } from "~/interface/leaveRequest";
 import CreateOrUpdateLeaveRequestModal from "~/screens/leave-request/modal/CreateOrUpdateLeaveRequestModal";
 import leaveRequestDepartmentApi from "~/api/leaveRequestDepartment.api";
 import { useFocusEffect } from "@react-navigation/native";
+import LeaveRequestDetailModal from "~/screens/leave-request/modal/LeaveRequestDetailModal";
 
 type Props = {
     data: any[];
@@ -64,10 +65,11 @@ const LeaveRequestList = ({ data, emptyText, status, isManager, onEndReached, on
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalDetailVisible, setModalDetailVisible] = useState(false);
     const [editingItem, setEditingItem] = useState<any>();
     const [page, setPage] = useState(1);
     const [refreshing, setRefreshing] = useState(false);
-
+    // console.log(data)
     const filteredData = useMemo(() => {
 
         if (!search) return data;
@@ -247,7 +249,10 @@ const LeaveRequestList = ({ data, emptyText, status, isManager, onEndReached, on
 
             <View style={styles.card}>
                 {/* Header */}
-                <View style={styles.rowBetween}>
+                <Pressable style={styles.rowBetween} onPress={() => {
+                    setEditingItem(item);
+                    setModalDetailVisible(true)
+                }}>
                     <Text style={styles.leaveType}>
                         {item.leaveTypeCategoryUnit?.displayName}
                     </Text>
@@ -257,7 +262,7 @@ const LeaveRequestList = ({ data, emptyText, status, isManager, onEndReached, on
                             {config.text}
                         </Text>
                     </View>
-                </View>
+                </Pressable>
 
                 {/* Time */}
                 <Text style={styles.time}>
@@ -437,11 +442,17 @@ const LeaveRequestList = ({ data, emptyText, status, isManager, onEndReached, on
                 editingItem={editingItem}
                 onClose={() => setModalVisible(false)}
                 onSubmit={(data) => {
-                    queryClient.invalidateQueries({
-                        queryKey: ["leaveRequests"]
-                    });
+                    onRefresh
                 }}
 
+            />
+
+            <LeaveRequestDetailModal
+                visible={modalDetailVisible}
+                isManager={isManager}
+                editingItem={editingItem}
+                onClose={() => setModalDetailVisible(false)}
+                reopenModal={() => setModalDetailVisible(true)}
             />
         </View>
 

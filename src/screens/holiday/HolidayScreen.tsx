@@ -18,6 +18,7 @@ import { PER_PAGE } from "~/utils/common";
 import { addDays, formatDateRender } from "~/utils/format/format";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { alertError } from "~/utils/alertMessageServer";
 
 const HolidayScreen = () => {
 
@@ -34,19 +35,23 @@ const HolidayScreen = () => {
     const [loadingMore, setLoadingMore] = useState(false);
 
     const fetchData = useCallback(async (pageIndex = 0, append = false) => {
+        try {
+            const res = await holidayApi.getHolidaySettings({
+                skipCount: pageIndex * PER_PAGE,
+                maxResultCount: PER_PAGE
+            });
 
-        const res = await holidayApi.getHolidaySettings({
-            skipCount: pageIndex * PER_PAGE,
-            maxResultCount: PER_PAGE
-        });
+            const result = res.data.result;
 
-        const result = res.data.result;
+            setItems(prev =>
+                append ? [...prev, ...result.items] : result.items
+            );
 
-        setItems(prev =>
-            append ? [...prev, ...result.items] : result.items
-        );
+            setTotalCount(result.totalCount);
+        } catch (error) {
+            alertError(error)
+        }
 
-        setTotalCount(result.totalCount);
 
     }, []);
 

@@ -100,7 +100,6 @@ const LoginScreen = () => {
             </View> */}
             {/* LOGO */}
             <View style={styles.logoWrap}>
-                {/* <Text style={styles.logo}></Text> */}
                 <Image
                     source={require('~/assets/images/logo/app-logo-removebg.png')}
                     style={{ width: normalize(200, 'width'), height: normalize(100) }}
@@ -110,10 +109,11 @@ const LoginScreen = () => {
 
             {/* CARD */}
             <View style={styles.card}>
-                <GradientText
+                {/* <GradientText
                     text={t("login.getStarted") || "Get Started"}
                     style={styles.title}
-                />
+                /> */}
+                <Text style={{ fontSize: 18, textAlign: 'center', marginBottom: 10, fontWeight: 500 }}>Đăng nhập ngay</Text>
 
                 <Text style={styles.subTitle}>
                     {t("login.createAccountOrLogin")}
@@ -137,12 +137,12 @@ const LoginScreen = () => {
                 </View> */}
 
                 {/* EMAIL */}
-                <Text style={styles.label}>{t("login.email")}</Text>
+                <Text style={styles.label}>Tài khoản</Text>
                 <TextInput
                     value={userNameOrEmailAddress}
                     onChangeText={setEmail}
                     style={styles.input}
-                    placeholder={t("login.email")}
+                    placeholder='Nhập tài khoản'
                     placeholderTextColor="#9CA3AF"
                 />
 
@@ -154,7 +154,7 @@ const LoginScreen = () => {
                         onChangeText={setPassword}
                         style={styles.inputPassword}
                         secureTextEntry={secure}
-                        placeholder={t("login.password")}
+                        placeholder='Nhập mật khẩu'
                         placeholderTextColor="#9CA3AF"
                     />
                     <TouchableOpacity onPress={() => setSecure(!secure)}>
@@ -255,6 +255,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 10,
         elevation: 5,
+        marginTop: 40
     },
 
     title: {

@@ -400,6 +400,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import attendanceCalculateRecordDepartmentApi from "~/api/attendanceCalculateRecordDepartment.api";
 import { MainParamList } from "~/navigation/MainNavigator";
 import { getAvatarColor, getAvatarLetter } from "~/utils/avatarColors";
+import { showToast } from "~/utils/toast";
+import { alertError } from "~/utils/alertMessageServer";
 
 const PAGE_SIZE = 10;
 
@@ -449,6 +451,7 @@ const ListUsersAttenCalendarScreen = () => {
             if (pageNumber === 1) {
 
                 setUsers(data);
+                setHasMore(true);
 
             } else {
 
@@ -461,8 +464,8 @@ const ListUsersAttenCalendarScreen = () => {
             }
 
         } catch (err) {
-
             console.log(err);
+            alertError(err)
 
         } finally {
 
@@ -501,7 +504,7 @@ const ListUsersAttenCalendarScreen = () => {
 
     const loadMore = async () => {
 
-        if (loadingMore || !hasMore) return;
+        if (loading || loadingMore || !hasMore) return;
 
         setLoadingMore(true);
 
@@ -510,9 +513,8 @@ const ListUsersAttenCalendarScreen = () => {
         await fetchUsers(nextPage, search);
 
         setPage(nextPage);
-
     };
-
+    const onEndReachedCalledDuringMomentum = React.useRef(false);
     /* ---------------- REFRESH ---------------- */
 
     const onRefresh = async () => {
@@ -691,7 +693,6 @@ const ListUsersAttenCalendarScreen = () => {
                 />
 
             ) : (
-
                 <FlatList
                     data={users}
                     keyExtractor={(item) => item.userId?.toString()}
@@ -705,15 +706,24 @@ const ListUsersAttenCalendarScreen = () => {
                         />
                     }
 
-                    onEndReached={loadMore}
-                    onEndReachedThreshold={0.4}
+                    onMomentumScrollBegin={() => {
+                        onEndReachedCalledDuringMomentum.current = false;
+                    }}
+
+                    onEndReached={() => {
+                        if (!onEndReachedCalledDuringMomentum.current) {
+                            loadMore();
+                            onEndReachedCalledDuringMomentum.current = true;
+                        }
+                    }}
+
+                    onEndReachedThreshold={0.3}
 
                     ListFooterComponent={
                         loadingMore
                             ? <ActivityIndicator style={{ marginVertical: 20 }} />
                             : null
                     }
-
                 />
 
             )}

@@ -72,7 +72,6 @@ const ProfileScreen = () => {
         try {
 
             setLoading(true);
-            console.log(name)
             const payload = {
                 userName,
                 name,

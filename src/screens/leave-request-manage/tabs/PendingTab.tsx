@@ -73,7 +73,7 @@ const PendingTab = () => {
                 data={items}
                 status={1}
                 emptyText="Không có chờ duyệt"
-                isManager={false}
+                isManager={true}
                 onEndReached={loadMore}
                 refreshing={refreshing}
                 onRefresh={onRefresh}

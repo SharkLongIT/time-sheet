@@ -7,27 +7,32 @@ import HeaderMain from '~/components/layout/base-header/header-main';
 import { appColors } from '~/utils/constants/appColors';
 import { BaseContent } from '~/components/base-screen/BaseContent';
 import { useAppColors } from '~/hooks/useAppColors';
+import DeviceInfo from "react-native-device-info";
 
 const AboutScreen = () => {
     const { t } = useTranslation();
     const colors = useAppColors();
+    const version = DeviceInfo.getVersion();
+    const buildNumber = DeviceInfo.getBuildNumber();
     return (
         <BaseContent >
             {/* <HeaderMain title={t('about.title')} /> */}
 
             <View style={styles.container}>
                 <Image
-                    source={require('~/assets/images/logo/AppLogo.png')}
+                    source={require('~/assets/images/logo/app-logo-removebg.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />
 
                 <Text style={[styles.appName, { color: colors.textPrimary }]}>
-                    {t('about.appName')}
+                    {/* {t('about.appName')} */}
+                    TimeSheet
                 </Text>
 
                 <Text style={styles.version}>
-                    v1.0.0
+
+                    Version: {version}
                 </Text>
 
                 <View style={[styles.card, { backgroundColor: colors.card }]}>
@@ -36,7 +41,7 @@ const AboutScreen = () => {
                     </Text>
                 </View>
             </View>
-        </BaseContent >
+        </BaseContent>
     );
 };
 

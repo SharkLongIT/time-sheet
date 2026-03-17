@@ -24,11 +24,11 @@ const SplashScreen = () => {
                     />
 
                     <Text style={[styles.appName, { color: colors.textPrimary }]}>
-                        React Native Core
+                        TimeSheet
                     </Text>
 
                     <Text style={[styles.tagline, { color: colors.textSecondary }]}>
-                        Build fast. Build clean.
+                        Theo dõi lịch làm việc, chấm công
                     </Text>
                 </View>
 
@@ -39,7 +39,7 @@ const SplashScreen = () => {
 
                 {/* FOOTER */}
                 <Text style={[styles.footer, { color: colors.textSecondary }]}>
-                    © 2026 BBK
+                    © 2026 BBK Solution
                 </Text>
             </View>
         </SafeAreaView>
@@ -66,9 +66,8 @@ const styles = StyleSheet.create({
     },
 
     logo: {
-        width: 96,
-        height: 96,
-        marginBottom: 16,
+        width: 100,
+        height: 100,
     },
 
     appName: {

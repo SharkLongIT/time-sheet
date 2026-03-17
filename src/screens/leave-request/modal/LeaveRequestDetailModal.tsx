@@ -7,51 +7,40 @@ import {
     TextInput,
     Pressable,
     ScrollView,
-    Alert
 } from "react-native";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useSelector } from "react-redux";
 import { RootState } from "~/redux/store";
-
 import leaveRequestApi from "~/api/leaveRequest.api";
 import leaveRequestUserApi from "~/api/leaveRequestUser.api";
-import leaveRequestAttApi from "~/api/leaveRequestAtt.api";
 import leaveRequestDepartmentApi from "~/api/leaveRequestDepartment.api";
-
-import DatePickerField from "~/components/date-picker/DatePickerField";
 import AppSelect from "~/components/select-base/AppSelect";
-
-import { pick } from "@react-native-documents/picker";
-
 import { useAppColors } from "~/hooks/useAppColors";
-import { getFileBytes } from "~/utils/convert/convertFile";
-import { showToast } from "~/utils/toast";
-import axios from "axios";
-import uuid from 'react-native-uuid';
-import { buildUrl } from "~/helper/url.helper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useQueryClient } from "@tanstack/react-query";
 import { alertError } from "~/utils/alertMessageServer";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { MainParamList } from "~/navigation/MainNavigator";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 interface Props {
     visible: boolean;
-    isManager: boolean;
+    isManager?: boolean;
     onClose: () => void;
+    reopenModal: () => void;
     editingItem?: any;
-    onSubmit?: (data: any) => void;
 }
 
-const CreateOrUpdateLeaveRequestModal = ({
+const LeaveRequestDetailModal = ({
     visible,
     isManager,
     onClose,
     editingItem,
-    onSubmit
+    reopenModal
 }: Props) => {
 
     const colors = useAppColors();
     const auth = useSelector((state: RootState) => state.auth.user);
-
+    const navigation = useNavigation<NativeStackNavigationProp<MainParamList>>();
     const [categories, setCategories] = useState<any[]>([]);
     const [periods, setPeriods] = useState<any[]>([]);
     const [users, setUsers] = useState<any[]>([]);
@@ -66,14 +55,6 @@ const CreateOrUpdateLeaveRequestModal = ({
     const [timeType, setTimeType] = useState(0);
     const [selectedPeriods, setSelectedPeriods] = useState<number[]>([]);
     const [attachment, setAttachment] = useState<any>(null);
-    const [errors, setErrors] = useState<any>({});
-
-    const queryClient = useQueryClient();
-
-    const formatDate = (date?: Date) => {
-        if (!date) return null;
-        return date.toISOString().split("T")[0];
-    };
 
     const resetForm = () => {
         setLeaveTypeCategoryUnitId(undefined);
@@ -83,7 +64,6 @@ const CreateOrUpdateLeaveRequestModal = ({
         setTimeType(0);
         setSelectedPeriods([]);
         setAttachment(null);
-        setErrors({});
     };
 
     const handleClose = () => {
@@ -91,15 +71,14 @@ const CreateOrUpdateLeaveRequestModal = ({
         onClose();
     };
 
-    // LOAD MASTER DATA
+    // LOAD DATA
     useEffect(() => {
 
-        if (!visible) return;
+        if (!visible || !editingItem) return;
 
-        const fetchData = async () => {
+        const loadEditData = async () => {
 
             try {
-
                 const cateRes = await leaveRequestApi.getAllCategoryUnitLeaveRequest();
                 setCategories(cateRes.data.result);
 
@@ -109,26 +88,6 @@ const CreateOrUpdateLeaveRequestModal = ({
                 }
 
                 loadPeriods(userId);
-
-            } catch (error) {
-                console.log(error);
-                alertError(error)
-            }
-
-        };
-
-        fetchData();
-
-    }, [visible]);
-
-    // LOAD EDIT DATA
-    useEffect(() => {
-
-        if (!visible || !editingItem) return;
-
-        const loadEditData = async () => {
-
-            try {
                 const res = await leaveRequestUserApi.getLeaveRequestById(editingItem.id);
                 const data = res.data.result;
                 setReason(data.reason ?? "");
@@ -152,7 +111,8 @@ const CreateOrUpdateLeaveRequestModal = ({
                     const resFile = await leaveRequestUserApi.getFile(data.filePath);
                     const file = resFile.data.result;
                     setAttachment({
-                        name: file.fileName
+                        name: file.fileName,
+                        filePath: data.filePath
                     })
                 }
 
@@ -184,223 +144,6 @@ const CreateOrUpdateLeaveRequestModal = ({
 
     };
 
-    const handleToggleUser = async (value: string) => {
-
-        setUserId(value);
-
-        setSelectedPeriods([]);
-
-        loadPeriods(value);
-
-    };
-
-    const togglePeriod = (id: number) => {
-
-        setSelectedPeriods(prev =>
-            prev.includes(id)
-                ? prev.filter(x => x !== id)
-                : [...prev, id]
-        );
-
-    };
-
-    const validate = () => {
-
-        const newErrors: any = {};
-        if (isManager && !userId)
-            newErrors.userId = "Vui lòng chọn người nghỉ phép";
-
-        if (!leaveTypeCategoryUnitId)
-            newErrors.leaveTypeCategoryUnitId = "Vui lòng chọn loại vắng mặt";
-
-        if (!startTime)
-            newErrors.startTime = "Vui lòng chọn ngày bắt đầu";
-
-        if (timeType === 0 && !endTime)
-            newErrors.endTime = "Vui lòng chọn ngày kết thúc";
-
-        if (!reason.trim())
-            newErrors.reason = "Vui lòng nhập lý do";
-
-        if (timeType === 1 && selectedPeriods.length === 0)
-            newErrors.periods = "Vui lòng chọn ca làm việc";
-
-        setErrors(newErrors);
-
-        return Object.keys(newErrors).length === 0;
-
-    };
-
-    const handlePickFile = async () => {
-
-        try {
-
-            const res = await pick({
-                // type: [DocumentPicker.types.allFiles],
-                // type: 'all',
-                allowMultiSelection: false
-            });
-            setAttachment(res[0]);
-
-        } catch (err) {
-            alertError(err)
-            // if (!DocumentPicker.isCancel(err))
-            //     console.log(err);
-
-        }
-
-    };
-
-    const removeFile = () => {
-        setAttachment(null);
-    };
-
-    const uploadAttachments = async (leaveRequestId: number) => {
-        try {
-
-            if (!attachment?.uri) return;
-            // if (editingItem && !attachment.uri) return;
-
-            const data = new FormData();
-
-            data.append("file", {
-                uri: attachment.uri,
-                name: attachment.name,
-                type: attachment.type || "application/octet-stream",
-            } as any);
-
-            const uploadRes = await axios.post(
-                buildUrl("/Mobile/LeaveRequest/UploadFile"),
-                data,
-                {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
-                }
-            );
-            // if (editingItem.id) {
-            //     await leaveRequestAttApi.updateLeavRequestAtt({
-            //         leaveRequestId,
-            //         filePath: uploadRes.data.result.fileName
-            //     })
-            // }
-            await leaveRequestAttApi.saveLeaveRequestAtt({
-                leaveRequestId,
-                filePath: uploadRes.data.result.fileName
-            });
-
-        } catch (error) {
-            console.log("upload error", error);
-            alertError(error)
-        }
-    };
-
-    const createLeaveRequest = async (status: "draft" | "submit") => {
-
-        const payload = {
-            leaveTypeCategoryUnitId: Number(leaveTypeCategoryUnitId),
-            userId: Number(userId),
-            reason,
-            startTime: formatDate(startTime),
-            endTime: timeType === 0 ? formatDate(endTime) : formatDate(startTime),
-            timeType,
-            shiftPeriodIds: selectedPeriods
-        };
-
-        let res;
-
-        if (isManager) {
-            res = await leaveRequestDepartmentApi.createLeaveRequest(payload);
-        } else {
-            res = await leaveRequestUserApi.createLeaveRequest(payload);
-
-        }
-
-        return res.data.result;
-
-    };
-
-    const handleSubmit = async (status: "draft" | "submit") => {
-
-        if (!validate()) return;
-
-        try {
-
-            const leaveRequest = await createLeaveRequest(status);
-            if (status === 'submit') {
-                await leaveRequestUserApi.sendLeaveRequest(leaveRequest.id)
-            }
-            await uploadAttachments(leaveRequest.id);
-
-            onSubmit?.(leaveRequest);
-
-            handleClose();
-
-            showToast(
-                "success",
-                "Thành công",
-                status === "draft"
-                    ? "Đã tạo bản nháp"
-                    : "Đã gửi yêu cầu"
-            );
-            // queryClient.invalidateQueries({
-            //     queryKey: ["leaveRequests"]
-            // });
-
-        } catch (error: any) {
-
-            console.log(error);
-
-            Alert.alert(
-                "Lỗi tạo đơn",
-                error?.error?.message || "Có lỗi xảy ra"
-            );
-
-        }
-
-    };
-
-
-    const handleSaveEdit = async () => {
-
-        if (!validate()) return;
-
-        try {
-
-            const payload = {
-                id: editingItem.id,
-                leaveTypeCategoryUnitId,
-                reason,
-                userId,
-                startTime: formatDate(startTime),
-                endTime: timeType === 0 ? formatDate(endTime) : formatDate(startTime),
-                timeType,
-                shiftPeriodIds: selectedPeriods
-            };
-
-            const res = await leaveRequestUserApi.editLeaveRequest(payload);
-
-            await uploadAttachments(editingItem.id);
-
-            onSubmit?.(res.data.result);
-
-            handleClose();
-
-            showToast("success", "Thành công", "Đã cập nhật đơn nghỉ");
-
-        } catch (error: any) {
-
-            Alert.alert(
-                "Lỗi cập nhật",
-                error?.error?.message || "Có lỗi xảy ra"
-            );
-
-        }
-
-    };
-
-    // handle
-
     return (
 
         <Modal
@@ -417,7 +160,7 @@ const CreateOrUpdateLeaveRequestModal = ({
                     <View style={styles.header}>
 
                         <Text style={styles.title}>
-                            {editingItem ? "Chỉnh sửa đơn nghỉ" : "Tạo đơn nghỉ"}
+                            Chi tiết đơn nghỉ
                         </Text>
 
                         <Pressable onPress={handleClose}>
@@ -431,37 +174,26 @@ const CreateOrUpdateLeaveRequestModal = ({
                         {isManager && (
                             <AppSelect
                                 label="Người nghỉ phép"
-                                placeholder="Chọn người nghỉ phép"
                                 value={userId}
                                 options={users?.map((p: any) => ({
                                     label: p.name,
                                     value: p.id.toString(),
                                 }))}
-                                onChange={(value) => handleToggleUser(value)}
-                                error={errors.userId}
-
                             />
                         )}
 
-
                         <AppSelect
                             label="Loại vắng mặt"
-                            placeholder="Chọn loại vắng mặt"
                             value={leaveTypeCategoryUnitId}
                             options={categories?.map((p: any) => ({
                                 label: p.displayName,
                                 value: p.id.toString(),
                             }))}
-                            onChange={setLeaveTypeCategoryUnitId}
                             required
-                            error={errors.leaveTypeCategoryUnitId}
+                            disabled={true}
                         />
 
-                        {/* {errors.leaveTypeCategoryUnitId &&
-                            <Text style={[styles.errorText, { marginTop: -10, marginBottom: 15 }]}>
-                                {errors.leaveTypeCategoryUnitId}
-                            </Text>
-                        } */}
+
 
                         <Text style={[styles.label, { marginTop: -5 }]}>Loại thời gian <Text style={styles.required}>*</Text></Text>
 
@@ -469,7 +201,8 @@ const CreateOrUpdateLeaveRequestModal = ({
 
                             <Pressable
                                 style={styles.radioItem}
-                                onPress={() => setTimeType(0)}
+                            // onPress={() => setTimeType(0)}
+
                             >
                                 <Ionicons
                                     name={timeType === 0 ? "radio-button-on" : "radio-button-off"}
@@ -481,7 +214,7 @@ const CreateOrUpdateLeaveRequestModal = ({
 
                             <Pressable
                                 style={styles.radioItem}
-                                onPress={() => setTimeType(1)}
+                            // onPress={() => setTimeType(1)}
                             >
                                 <Ionicons
                                     name={timeType === 1 ? "radio-button-on" : "radio-button-off"}
@@ -495,31 +228,21 @@ const CreateOrUpdateLeaveRequestModal = ({
 
                         <Text style={styles.label}>Ngày bắt đầu <Text style={styles.required}>*</Text></Text>
 
-                        <DatePickerField
-                            label="Chọn ngày bắt đầu"
-                            value={startTime}
-                            onChange={setStartTime}
-                            error={errors.startTime}
+                        <TextInput
+                            style={[styles.inputText]}
+                            value={startTime?.toLocaleDateString("vi-VN")}
+                            editable={false}
                         />
-
-                        {/* {errors.startTime &&
-                            <Text style={styles.errorText}>{errors.startTime}</Text>
-                        } */}
 
                         {timeType === 0 && (
                             <>
                                 <Text style={styles.label}>Ngày kết thúc <Text style={styles.required}>*</Text></Text>
 
-                                <DatePickerField
-                                    label="Chọn ngày kết thúc"
-                                    value={endTime}
-                                    onChange={setEndTime}
-                                    error={errors.endTime}
+                                <TextInput
+                                    style={[styles.inputText]}
+                                    value={endTime?.toLocaleDateString("vi-VN")}
+                                    editable={false}
                                 />
-
-                                {/* {errors.endTime &&
-                                    <Text style={styles.errorText}>{errors.endTime}</Text>
-                                } */}
                             </>
                         )}
 
@@ -538,7 +261,7 @@ const CreateOrUpdateLeaveRequestModal = ({
                                                 styles.periodItem,
                                                 selected && styles.periodItemActive
                                             ]}
-                                            onPress={() => togglePeriod(p.shiftPeriodDto.id)}
+                                            disabled
                                         >
                                             <Ionicons
                                                 name={selected ? "checkbox" : "square-outline"}
@@ -551,10 +274,6 @@ const CreateOrUpdateLeaveRequestModal = ({
                                         </Pressable>
                                     );
                                 })}
-
-                                {errors.periods &&
-                                    <Text style={styles.errorText}>{errors.periods}</Text>
-                                }
                             </>
                         )}
 
@@ -563,31 +282,34 @@ const CreateOrUpdateLeaveRequestModal = ({
                         <TextInput
                             style={[
                                 styles.input,
-                                errors.reason && styles.inputError
                             ]}
-                            placeholder="Nhập lý do..."
                             value={reason}
-                            onChangeText={setReason}
                             multiline
+                            editable={false}
                         />
-
-                        {errors.reason &&
-                            <Text style={styles.errorText}>{errors.reason}</Text>
-                        }
 
                         <Text style={styles.label}>Tệp minh chứng</Text>
 
-                        <Pressable
-                            style={styles.uploadButton}
-                            onPress={handlePickFile}
-                        >
-                            <Ionicons name="cloud-upload-outline" size={20} color="#6366F1" />
-                            <Text style={styles.uploadText}>Chọn tệp</Text>
-                        </Pressable>
-
-                        {/* {attachments.map((file, index) => ( */}
                         {attachment && (
-                            <View key={attachment.name} style={styles.fileItem}>
+                            <Pressable
+                                onPress={() => {
+                                    onClose();
+                                    let type = 1;
+
+                                    if (isManager) {
+                                        type = 3;
+                                    } else {
+                                        type = 2;
+                                    }
+                                    navigation.push("ViewFile", {
+                                        title: attachment.name,
+                                        filepath: attachment.filePath,
+                                        type,
+                                        reopenModal
+                                    });
+                                }}
+                                key={attachment.name} style={styles.fileItem}
+                            >
 
                                 <Ionicons name="document-outline" size={18} />
 
@@ -595,11 +317,7 @@ const CreateOrUpdateLeaveRequestModal = ({
                                     {attachment.name}
                                 </Text>
 
-                                <Pressable onPress={() => removeFile()}>
-                                    <Ionicons name="close-circle" size={18} color="red" />
-                                </Pressable>
-
-                            </View>
+                            </Pressable>
                         )}
 
 
@@ -607,47 +325,21 @@ const CreateOrUpdateLeaveRequestModal = ({
                         {/* ))} */}
 
                     </ScrollView>
-                    {isManager ? (
-                        <View style={styles.actionRow}>
-                            <Pressable
-                                style={styles.saveEdit}
-                                onPress={handleSaveEdit}
-                            >
-                                <Text style={styles.submitText}>Tạo mới và Duyệt</Text>
-                            </Pressable>
-                        </View>
-                    ) : editingItem ? (
 
-                        <View style={styles.actionRow}>
-                            <Pressable
-                                style={styles.saveEdit}
-                                onPress={handleSaveEdit}
-                            >
-                                <Text style={styles.submitText}>Lưu thông tin</Text>
-                            </Pressable>
-                        </View>
 
-                    ) : (
+                    <View style={styles.actionRow}>
 
-                        <View style={styles.actionRow}>
 
-                            <Pressable
-                                style={styles.draftButton}
-                                onPress={() => handleSubmit("draft")}
-                            >
-                                <Text style={styles.draftText}>Tạo bản nháp</Text>
-                            </Pressable>
 
-                            <Pressable
-                                style={styles.submitButton}
-                                onPress={() => handleSubmit("submit")}
-                            >
-                                <Text style={styles.submitText}>Gửi yêu cầu</Text>
-                            </Pressable>
+                        <Pressable
+                            style={styles.submitButton}
+                            onPress={() => onClose()}
+                        >
+                            <Text style={styles.submitText}>Đóng</Text>
+                        </Pressable>
 
-                        </View>
+                    </View>
 
-                    )}
 
                 </View>
 
@@ -658,7 +350,7 @@ const CreateOrUpdateLeaveRequestModal = ({
     );
 };
 
-export default CreateOrUpdateLeaveRequestModal;
+export default LeaveRequestDetailModal;
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
@@ -720,6 +412,14 @@ const styles = StyleSheet.create({
         minHeight: 80,
         backgroundColor: "#fff"
     },
+    inputText: {
+        borderWidth: 1,
+        borderColor: "#e5e7eb",
+        borderRadius: 8,
+        padding: 10,
+        minHeight: 45,
+        backgroundColor: "#fff"
+    },
     inputError: {
         borderColor: "#EF4444"
     },
@@ -748,7 +448,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 8,
-        backgroundColor: "#F8FAFC",
+        backgroundColor: "rgb(238, 235, 235)",
         padding: 10,
         borderRadius: 8,
         marginTop: 6

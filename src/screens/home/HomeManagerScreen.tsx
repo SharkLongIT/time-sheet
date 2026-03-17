@@ -27,24 +27,16 @@ import { Picker } from "@react-native-picker/picker";
 import { Dropdown } from "react-native-element-dropdown";
 import hrmSettingsApi from "~/api/hrmSettings.api";
 import { PieChart } from "react-native-chart-kit";
+import { alertError } from "~/utils/alertMessageServer";
 
 const screenWidth = Dimensions.get("window").width;
 
 const HomeManagerScreen = () => {
 
     const navigation = useNavigation<DrawerNavigationProp<any>>();
-    const { t } = useTranslation();
     const colors = useAppColors();
-    const auth = useSelector((state: RootState) => state.auth.user);
-
     const [summary, setSummary] = useState<any>(null);
-
-    const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const endDate = new Date();
-
-
     const currentMonth = new Date().getMonth() + 1;
-
     const months = Array.from({ length: currentMonth }, (_, i) => ({
         label: `Tháng ${i + 1}`,
         value: i + 1
@@ -53,36 +45,6 @@ const HomeManagerScreen = () => {
 
     const [report, setReport] = useState<any>();
     const [settings, setSettings] = useState<any>();
-    const data = [
-        {
-            name: "Về sớm",
-            population: report?.totalEarlyLeave || 0,
-            color: "#f59e0b",
-            legendFontColor: "#374151",
-            legendFontSize: 12
-        },
-        {
-            name: "Đi muộn",
-            population: report?.totalLate || 0,
-            color: "#3b82f6",
-            legendFontColor: "#374151",
-            legendFontSize: 12
-        },
-        {
-            name: "Muộn + sớm",
-            population: report?.totalLateAndEarlyLeave || 0,
-            color: "#8b5cf6",
-            legendFontColor: "#374151",
-            legendFontSize: 12
-        },
-        {
-            name: "Vắng",
-            population: report?.totalAbsent || 0,
-            color: "#ef4444",
-            legendFontColor: "#374151",
-            legendFontSize: 12
-        }
-    ];
 
     const fetchData = async (selectedMonth: number) => {
 
@@ -110,12 +72,12 @@ const HomeManagerScreen = () => {
             setReport(resReport.data.result);
 
             const resSettings = await hrmSettingsApi.getAllSettings();
-            console.log(resSettings.data.result.settingsDashboard);
             setSettings(resSettings.data?.result?.settingsDashboard)
 
         } catch (error) {
 
             console.log(error);
+            alertError(error)
 
         }
 
@@ -144,7 +106,6 @@ const HomeManagerScreen = () => {
     return (
 
         <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-
             <HeaderMain title="Quản lý" />
 
             <ScrollView
@@ -175,41 +136,61 @@ const HomeManagerScreen = () => {
                     <Text style={styles.sectionTitle}>
                         Tổng quan chấm công phòng ban
                     </Text>
-
                     <BarChart
                         data={{
                             labels: [
                                 "Về sớm",
                                 "Đi muộn",
-                                "Đi muộn + về sớm",
+                                "Đi muộn Về sớm",
                                 "Vắng"
                             ],
-                            datasets: [{
-                                data: [
-                                    report?.totalEarlyLeave || 0,
-                                    report?.totalLate || 0,
-                                    report?.totalLateAndEarlyLeave || 0,
-                                    report?.totalAbsent || 0
-                                ]
-                            }]
+                            datasets: [
+                                {
+                                    data: [
+                                        report?.totalEarlyLeave || 0,
+                                        report?.totalLate || 0,
+                                        report?.totalLateAndEarlyLeave || 0,
+                                        report?.totalAbsent || 0
+                                    ],
+                                    colors: [
+                                        () => "#22C55E", // xanh lá
+                                        () => "#F59E0B", // cam
+                                        () => "#6366F1", // tím
+                                        () => "#EF4444"  // đỏ
+                                    ]
+                                }
+                            ]
                         }}
                         width={screenWidth - 40}
-                        height={250}
+                        height={260}
                         fromZero
                         showValuesOnTopOfBars
-                        verticalLabelRotation={20}
+                        withCustomBarColorFromData
+                        flatColor
+                        verticalLabelRotation={0}
                         chartConfig={{
                             backgroundGradientFrom: "#ffffff",
                             backgroundGradientTo: "#ffffff",
                             decimalPlaces: 0,
-                            barPercentage: 0.6,
-                            color: (opacity = 1) => `rgba(59,130,246,${opacity})`,
-                            labelColor: () => "#374151",
+
+                            barPercentage: 0.5,
+
+                            color: () => "#3B82F6",
+                            labelColor: () => "#111827",
+
+                            propsForLabels: {
+                                fontSize: 12
+                            },
+
                             propsForBackgroundLines: {
-                                stroke: "#e5e7eb"
+                                stroke: "#E5E7EB",
+                                strokeDasharray: "4"
                             }
                         }}
-                        style={styles.chart}
+                        style={{
+                            marginVertical: 10,
+                            borderRadius: 16
+                        }}
                         yAxisLabel=""
                         yAxisSuffix=""
                     />
@@ -330,7 +311,7 @@ const styles = StyleSheet.create({
     },
 
     dateRange: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 14,
         marginTop: 10
     },
     chart: {
