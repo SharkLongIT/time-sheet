@@ -1,56 +1,157 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
     View,
     Text,
     StyleSheet,
     FlatList,
-    Pressable
+    Pressable,
+    TextInput,
+    RefreshControl,
+    ActivityIndicator
 } from "react-native";
+
+import Ionicons from "react-native-vector-icons/Ionicons";
+import dayjs from "dayjs";
 
 import { BaseContent } from "~/components/base-screen/BaseContent";
 import shiftScheduleDepartmentApi from "~/api/shiftScheduleDepartment.api";
+import { MainParamList } from "~/navigation/MainNavigator";
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MainParamList } from "~/navigation/MainNavigator";
-
-import Ionicons from "react-native-vector-icons/Ionicons";
 
 import { formatDateRender } from "~/utils/format/format";
-import dayjs from "dayjs";
 import { getAvatarColor, getAvatarLetter } from "~/utils/avatarColors";
 import { alertError } from "~/utils/alertMessageServer";
 
+const PAGE_SIZE = 10;
+
 const ListUsersShiftScheduleScreen = () => {
 
-    const [users, setUsers] = useState<any[]>([]);
     const navigation =
         useNavigation<NativeStackNavigationProp<MainParamList>>();
 
-    useEffect(() => {
+    const [allUsers, setAllUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<any[]>([]);
 
-        const fetchData = async () => {
+    const [search, setSearch] = useState("");
 
-            try {
+    const [page, setPage] = useState(1);
 
-                const res =
-                    await shiftScheduleDepartmentApi
-                        .getShiftSchedulesDepartment({});
+    const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
-                setUsers(res.data.result.items);
+    const [hasMore, setHasMore] = useState(true);
 
-            } catch (err: any) {
-                console.log(err);
-                alertError(err)
+    const onEndReachedCalledDuringMomentum = useRef(false);
+
+    /* ---------------- FETCH DATA ---------------- */
+
+    const fetchData = async (pageNumber = 1) => {
+
+        try {
+
+            const res =
+                await shiftScheduleDepartmentApi
+                    .getShiftSchedulesDepartment({
+                        skipCount: (pageNumber - 1) * PAGE_SIZE,
+                        maxResultCount: PAGE_SIZE
+                    });
+
+            const data = res?.data?.result?.items || [];
+
+            if (pageNumber === 1) {
+
+                setAllUsers(data);
+                setUsers(data);
+
+            } else {
+
+                setAllUsers(prev => [...prev, ...data]);
+                setUsers(prev => [...prev, ...data]);
+
             }
 
-        };
+            if (data.length < PAGE_SIZE) {
+                setHasMore(false);
+            }
 
-        fetchData();
+        } catch (err) {
 
+            alertError(err);
+
+        } finally {
+
+            setLoading(false);
+            setLoadingMore(false);
+            setRefreshing(false);
+
+        }
+
+    };
+
+    useEffect(() => {
+        fetchData(1);
     }, []);
 
-    /* ---------- USER CARD ---------- */
+    /* ---------------- SEARCH LOCAL ---------------- */
+
+    useEffect(() => {
+
+        if (!search) {
+
+            setUsers(allUsers);
+            return;
+
+        }
+
+        const keyword = search.toLowerCase();
+
+        const filtered = allUsers.filter(item => {
+
+            const name =
+                (item.user?.name || item.name || "")
+                    .toLowerCase();
+
+            return name.includes(keyword);
+
+        });
+
+        setUsers(filtered);
+
+    }, [search, allUsers]);
+
+    /* ---------------- LOAD MORE ---------------- */
+
+    const loadMore = async () => {
+
+        if (loadingMore || !hasMore || search) return;
+
+        const nextPage = page + 1;
+
+        setLoadingMore(true);
+
+        await fetchData(nextPage);
+
+        setPage(nextPage);
+
+    };
+
+    /* ---------------- REFRESH ---------------- */
+
+    const onRefresh = async () => {
+
+        setRefreshing(true);
+
+        setPage(1);
+        setHasMore(true);
+
+        await fetchData(1);
+
+    };
+
+    /* ---------------- RENDER ITEM ---------------- */
 
     const renderItem = ({ item }: { item: any }) => {
 
@@ -70,18 +171,18 @@ const ListUsersShiftScheduleScreen = () => {
             <Pressable
                 style={styles.card}
                 onPress={() => {
-                    const start = dayjs(item.effectiveBeginDate).format("YYYY-MM-DD");
+
+                    const startDate =
+                        dayjs(item.effectiveBeginDate)
+                            .format("YYYY-MM-DD");
+
                     navigation.navigate("ShiftScheduleDepartment", {
                         userId: item.user?.id,
-                        start: start,
-                        // end: end
-                    })
+                        start: startDate
+                    });
 
-                }
-                }
+                }}
             >
-
-                {/* HEADER */}
 
                 <View style={styles.header}>
 
@@ -126,8 +227,6 @@ const ListUsersShiftScheduleScreen = () => {
 
                 </View>
 
-                {/* DATE RANGE */}
-
                 <View style={styles.dateRow}>
 
                     <Ionicons
@@ -148,17 +247,109 @@ const ListUsersShiftScheduleScreen = () => {
 
     };
 
+    /* ---------------- SKELETON ---------------- */
+
+    const Skeleton = () => (
+
+        <View style={styles.card}>
+
+            <View
+                style={{
+                    height: 20,
+                    backgroundColor: "#e5e7eb",
+                    borderRadius: 6,
+                    marginBottom: 10
+                }}
+            />
+
+            <View
+                style={{
+                    height: 14,
+                    backgroundColor: "#e5e7eb",
+                    borderRadius: 6,
+                    width: "60%"
+                }}
+            />
+
+        </View>
+
+    );
+
+    /* ---------------- UI ---------------- */
+
     return (
 
         <BaseContent>
 
-            <FlatList
-                data={users}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.list}
-                showsVerticalScrollIndicator={false}
-            />
+            <View style={styles.searchBox}>
+
+                <Ionicons
+                    name="search"
+                    size={18}
+                    color="#9ca3af"
+                />
+
+                <TextInput
+                    placeholder="Tìm nhân viên..."
+                    style={styles.searchInput}
+                    value={search}
+                    onChangeText={setSearch}
+                />
+
+            </View>
+
+            {loading ? (
+
+                <FlatList
+                    data={[1, 2, 3, 4]}
+                    renderItem={() => <Skeleton />}
+                    keyExtractor={(item) => item.toString()}
+                    contentContainerStyle={{ padding: 16 }}
+                />
+
+            ) : (
+
+                <FlatList
+                    data={users}
+                    keyExtractor={(item) => item.id?.toString()}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.list}
+                    showsVerticalScrollIndicator={false}
+
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
+
+                    onMomentumScrollBegin={() => {
+                        onEndReachedCalledDuringMomentum.current = false;
+                    }}
+
+                    onEndReached={() => {
+
+                        if (!onEndReachedCalledDuringMomentum.current) {
+
+                            loadMore();
+
+                            onEndReachedCalledDuringMomentum.current = true;
+
+                        }
+
+                    }}
+
+                    onEndReachedThreshold={0.3}
+
+                    ListFooterComponent={
+                        loadingMore
+                            ? <ActivityIndicator style={{ marginVertical: 20 }} />
+                            : null
+                    }
+
+                />
+
+            )}
 
         </BaseContent>
 
@@ -168,13 +359,28 @@ const ListUsersShiftScheduleScreen = () => {
 
 export default ListUsersShiftScheduleScreen;
 
-
-/* ---------- STYLES ---------- */
+/* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
 
     list: {
-        padding: 16
+        padding: 16,
+        paddingTop: 0
+    },
+
+    searchBox: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#fff",
+        margin: 16,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+        height: 42
+    },
+
+    searchInput: {
+        flex: 1,
+        marginLeft: 8
     },
 
     card: {
@@ -198,7 +404,6 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: "#2563eb",
         justifyContent: "center",
         alignItems: "center",
         marginRight: 12

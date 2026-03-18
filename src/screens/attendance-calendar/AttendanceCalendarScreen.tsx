@@ -529,7 +529,7 @@ const AttendanceCalendarScreen = () => {
             result.attendanceRecords.forEach((record: any) => {
 
                 const date = record.calcDate.split("T")[0];
-                console.log(record)
+
                 let color = "#ccc";
                 let label = "";
                 if (record.isNormal) {

@@ -128,7 +128,7 @@ const ShiftScheduleDepartmentScreen = () => {
                 };
 
             });
-
+            // console.log(marks)
             setMarkedDates(marks);
 
         } catch (err) {
@@ -185,7 +185,6 @@ const ShiftScheduleDepartmentScreen = () => {
     const renderDay = ({ date }: any) => {
 
         const event = markedDates?.[date.dateString];
-
         return (
 
             <Pressable
@@ -211,10 +210,15 @@ const ShiftScheduleDepartmentScreen = () => {
 
                         <Text style={styles.eventText} numberOfLines={1}>
 
-                            {event.data.length > 1
+                            {/* {event.data.length > 1
                                 ? `${event.data[0].shiftPeriodName} +${event.data.length - 1}`
-                                : event.data[0].shiftPeriodName || ""}
+                                : event.data[0].shiftPeriodName || ""} */}
 
+                            <Text style={styles.eventText} numberOfLines={1}>
+                                {event.data
+                                    .map((i: any) => i.shiftPeriodName)
+                                    .join(", ")}
+                            </Text>
                         </Text>
 
                     </View>

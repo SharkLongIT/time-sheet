@@ -72,47 +72,54 @@ const ShiftDetailUserModal = ({ visible, onClose, shiftId }: Props) => {
 
         if (!shift || !shiftPeriodList) return [];
 
-        const periodMap: any = {};
-
-        shiftPeriodList.forEach((p: any) => {
-            periodMap[p.id] = p;
-        });
+        const periodMap = shiftPeriodList.reduce((acc: any, p: any) => {
+            acc[p.id] = p;
+            return acc;
+        }, {});
 
         const mapping: any = {};
 
         shift.shiftPeriodMapping?.forEach((item: any) => {
 
+            const period = periodMap[item.shiftPeriodId];
+            if (!period) return;
+
             if (!mapping[item.mappingIndex]) {
                 mapping[item.mappingIndex] = [];
             }
 
-            const period = periodMap[item.shiftPeriodId];
-
-            if (period) {
-
-                const start = convertSecondsToTime(period.startTime);
-                const end = convertSecondsToTime(period.endTime);
-
-                const text =
-                    `${period.shiftPeriodName} (Từ Ngày hiện tại ${start}-${end} Ngày hiện tại)`;
-
-                mapping[item.mappingIndex].push(text);
-            }
+            mapping[item.mappingIndex].push({
+                name: period.shiftPeriodName,
+                start: period.startTime,
+                end: period.endTime
+            });
 
         });
 
-        const result: any[] = [];
+        Object.keys(mapping).forEach(key => {
+            mapping[key].sort((a: any, b: any) => a.start - b.start);
+        });
 
-        for (let i = 1; i <= 7; i++) {
+        return Array.from({ length: 7 }, (_, i) => {
 
-            result.push({
-                day: dayNames[i - 1],
-                periods: mapping[i] || []
+            const periods = (mapping[i + 1] || []).map((p: any) => {
+
+                const start = convertSecondsToTime(p.start);
+                const end = convertSecondsToTime(p.end);
+
+                // const text = `${p.name} (Từ Ngày hiện tại ${start}-${end} Ngày hiện tại)`;
+                // return text;
+
+                return `${p.name} (${start}-${end})`;
+
             });
 
-        }
+            return {
+                day: dayNames[i],
+                periods
+            };
 
-        return result;
+        });
 
     }, [shift, shiftPeriodList]);
 
@@ -124,100 +131,139 @@ const ShiftDetailUserModal = ({ visible, onClose, shiftId }: Props) => {
 
                 <View style={styles.modalContainer}>
 
-                    <Text style={styles.title}>Chi tiết lịch</Text>
+
+                    <View style={styles.header}>
+
+                        <Text style={styles.title}>
+                            Chi tiết lịch làm việc
+                        </Text>
+
+                        <TouchableOpacity
+                            onPress={onClose}
+                        >
+                            <Text style={styles.closeIcon}>
+                                ✕
+                            </Text>
+                        </TouchableOpacity>
+
+                    </View>
+
 
                     <ScrollView showsVerticalScrollIndicator={false}>
+                        {/* Thông tin lịch */}
 
-                        {/* THÔNG TIN LỊCH */}
+
+                        <Text style={styles.sectionTitle}>
+                            1. Thông tin lịch
+                        </Text>
 
                         <View style={styles.card}>
 
-                            <Text style={styles.sectionTitle}>Thông tin lịch</Text>
-
                             <View style={styles.row}>
-                                <Text style={styles.label}>Tên bảng thời gian</Text>
-                                <Text style={styles.value}>{shift?.shiftName}</Text>
+                                <Text style={styles.label}>
+                                    Tên bảng thời gian
+                                </Text>
+
+                                <Text style={styles.value}>
+                                    {shift?.shiftName || "-"}
+                                </Text>
                             </View>
 
+
                             <View style={styles.row}>
-                                <Text style={styles.label}>Phương thức tính công</Text>
+                                <Text style={styles.label}>
+                                    Phương thức tính công
+                                </Text>
+
                                 <Text style={styles.value}>
-                                    {getAttendanceRuleMode(shift?.attendanceRuleMode)}
+                                    {getAttendanceRuleMode(
+                                        shift?.attendanceRuleMode
+                                    )}
                                 </Text>
                             </View>
 
                         </View>
 
 
-                        {/* CẤU HÌNH LẶP */}
+
+                        {/* Cấu hình lặp */}
+
+
+
+                        <Text style={styles.sectionTitle}>
+                            2. Cấu hình lặp lại
+                        </Text>
 
                         <View style={styles.card}>
 
-                            <Text style={styles.sectionTitle}>Cấu hình lặp lại</Text>
-
                             <View style={styles.row}>
-                                <Text style={styles.label}>Chế độ lặp lại</Text>
+                                <Text style={styles.label}>
+                                    Chế độ lặp lại
+                                </Text>
+
                                 <Text style={styles.value}>
-                                    {getRepeatMode(shift?.shiftMode)}
+                                    {getRepeatMode(
+                                        shift?.shiftMode
+                                    )}
                                 </Text>
                             </View>
 
+
                             <View style={styles.row}>
-                                <Text style={styles.label}>Lặp lại mỗi</Text>
+                                <Text style={styles.label}>
+                                    Lặp lại mỗi
+                                </Text>
+
                                 <Text style={styles.value}>
-                                    {shift?.shiftDayNum}
+                                    {shift?.shiftDayNum} ngày
                                 </Text>
                             </View>
 
                         </View>
 
 
-                        {/* BẢNG CA */}
 
-                        <View style={styles.card}>
+                        <Text style={styles.sectionTitle}>3. Danh sách ca</Text>
 
-                            <Text style={styles.sectionTitle}>Danh sách ca</Text>
+                        <View style={styles.table}>
 
-                            <View style={styles.table}>
+                            {/* HEADER */}
 
-                                {/* HEADER */}
+                            <View style={styles.headerRow}>
+                                <Text style={styles.headerDay}>Ngày trong tuần</Text>
+                                <Text style={styles.headerShift}>Tên ca làm việc</Text>
+                            </View>
 
-                                <View style={styles.headerRow}>
-                                    <Text style={styles.headerDay}>Ngày trong tuần</Text>
-                                    <Text style={styles.headerShift}>Tên ca làm việc</Text>
-                                </View>
+                            {rows.map((row, index) => (
 
-                                {rows.map((row, index) => (
+                                <View
+                                    key={index}
+                                    style={[
+                                        styles.dataRow,
+                                        index % 2 === 0
+                                            ? styles.rowWhite
+                                            : styles.rowGray
+                                    ]}
+                                >
 
-                                    <View
-                                        key={index}
-                                        style={[
-                                            styles.dataRow,
-                                            index % 2 === 0
-                                                ? styles.rowWhite
-                                                : styles.rowGray
-                                        ]}
-                                    >
+                                    <Text style={styles.dayCell}>
+                                        {row.day}
+                                    </Text>
 
-                                        <Text style={styles.dayCell}>
-                                            {row.day}
-                                        </Text>
-
-                                        <View style={styles.shiftCell}>
-                                            {row.periods.map((p: string, i: number) => (
-                                                <Text key={i} style={styles.shiftText}>
-                                                    {p}
-                                                </Text>
-                                            ))}
-                                        </View>
-
+                                    <View style={styles.shiftCell}>
+                                        {row.periods.map((p: string, i: number) => (
+                                            <Text key={i} style={styles.shiftText}>
+                                                {p}
+                                            </Text>
+                                        ))}
                                     </View>
 
-                                ))}
+                                </View>
 
-                            </View>
+                            ))}
 
                         </View>
+
 
                     </ScrollView>
 
@@ -251,14 +297,24 @@ const styles = StyleSheet.create({
         padding: 20,
         maxHeight: "90%"
     },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 14
+    },
 
     title: {
         fontSize: 20,
         fontWeight: "700",
-        textAlign: "center",
-        marginBottom: 16,
-        color: "#1e293b"
+        color: "#111827"
     },
+
+    closeIcon: {
+        fontSize: 20,
+        color: "#64748b"
+    },
+
 
     card: {
         backgroundColor: "#ffffff",
@@ -275,9 +331,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         color: "#334155"
     },
-
     row: {
-        flexDirection: "row",
+        // flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 8
     },
@@ -290,7 +345,8 @@ const styles = StyleSheet.create({
     value: {
         fontSize: 14,
         fontWeight: "600",
-        color: "#111827"
+        color: "#111827",
+        marginTop: 4
     },
 
     table: {
