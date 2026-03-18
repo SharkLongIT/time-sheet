@@ -617,28 +617,28 @@ const ListUsersAttenCalendarScreen = () => {
 
                     <Stat
                         icon="time"
-                        label="Muộn"
+                        label="Đi muộn"
                         value={item.totalLateDays || 0}
                         color="#f59e0b"
                     />
 
                     <Stat
                         icon="exit"
-                        label="Sớm"
+                        label="Về sớm"
                         value={item.totalEarlyLeaveDays || 0}
                         color="#fb923c"
                     />
 
                     <Stat
                         icon="close-circle"
-                        label="Vắng"
+                        label="Vắng mặt"
                         value={item.totalAbsentDays || 0}
                         color="#ef4444"
                     />
 
                     <Stat
                         icon="airplane"
-                        label="Nghỉ"
+                        label="Nghỉ phép"
                         value={item.totalHasLeaveDays || 0}
                         color="#6366f1"
                     />

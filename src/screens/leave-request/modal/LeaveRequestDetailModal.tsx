@@ -179,6 +179,7 @@ const LeaveRequestDetailModal = ({
                                     label: p.name,
                                     value: p.id.toString(),
                                 }))}
+                                disabled
                             />
                         )}
 
@@ -190,7 +191,7 @@ const LeaveRequestDetailModal = ({
                                 value: p.id.toString(),
                             }))}
                             required
-                            disabled={true}
+                            disabled
                         />
 
 

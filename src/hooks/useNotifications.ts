@@ -31,6 +31,7 @@ const mapNotification = (item: any): INotification => {
 export const useNotifications = () => {
     const [items, setItems] = useState<any[]>([]);
     const [totalCount, setTotalCount] = useState(0);
+    const [totalUnRead, setTotalUnRead] = useState(0);
     const [filter, setFilter] = useState<FilterType>("ALL");
     const [page, setPage] = useState(0);
     const pageSize = 10;
@@ -59,6 +60,7 @@ export const useNotifications = () => {
 
             setItems(prev => (append ? [...prev, ...mappedItems] : mappedItems));
             setTotalCount(res.data.result.totalCount);
+            setTotalUnRead(res.data.result.unreadCount);
         },
         [auth?.id]
     );
@@ -117,6 +119,7 @@ export const useNotifications = () => {
         refreshing,
         opacity,
         toggleFilter,
-        filter
+        filter,
+        totalUnRead
     };
 };

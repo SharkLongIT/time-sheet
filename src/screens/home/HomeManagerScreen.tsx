@@ -161,7 +161,7 @@ const HomeManagerScreen = () => {
                                 }
                             ]
                         }}
-                        width={screenWidth - 40}
+                        width={screenWidth - 50}
                         height={260}
                         fromZero
                         showValuesOnTopOfBars

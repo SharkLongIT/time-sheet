@@ -80,6 +80,7 @@ android {
     namespace "com.rncore"
     defaultConfig {
         applicationId "com.bbksolution.timesheet"
+        // com.BBKSolution.Hrm.mobile
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -44,12 +44,12 @@ export const getAttendanceStatus = (record: any) => {
         return { label: "Đi làm đúng giờ", color: "#22c55e" };
 
     if (record.absent && record.isToday)
-        return { label: "Chưa có dữ liệu chấm công", color: "#64748b" };
+        return { label: "Chưa có dữ liệu chấm công", color: "#605DFF" };
 
     if (record.absent)
         return { label: "Vắng mặt", color: "#ef4444" };
 
-    return { label: "Chưa có dữ liệu chấm công", color: "#64748b" };
+    return { label: "Chưa có dữ liệu chấm công", color: "#605DFF" };
 };
 export const daysOfWeek = [
     "Chủ nhật",

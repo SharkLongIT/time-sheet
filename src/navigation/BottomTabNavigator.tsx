@@ -121,7 +121,7 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
 /* -------------------- Navigator -------------------- */
 export default function BottomTabNavigator() {
     const { t } = useTranslation();
-    const { totalCount } = useNotifications();
+    const { totalUnRead } = useNotifications();
     // const isDashboardDepartment = isGranted(
     //     Permissions.Pages_Hrm_Administration_DashboardDepartment
     // );
@@ -171,10 +171,10 @@ export default function BottomTabNavigator() {
                                 size={24}
                                 color={focused ? appColors.hight_light : "#9CA3AF"}
                             />
-                            {totalCount > 0 && (
+                            {totalUnRead > 0 && (
                                 <View style={styles.badge}>
                                     <Text style={styles.badgeText}>
-                                        {totalCount > 99 ? "99+" : totalCount}
+                                        {totalUnRead > 99 ? "99+" : totalUnRead}
                                     </Text>
                                 </View>
                             )}

@@ -265,9 +265,10 @@ const CreateOrUpdateLeaveRequestModal = ({
 
             data.append("file", {
                 uri: attachment.uri,
-                name: attachment.name,
+                name: attachment.name || 'tep-minh-chung',
                 type: attachment.type || "application/octet-stream",
             } as any);
+            console.log(data)
 
             const uploadRes = await axios.post(
                 buildUrl("/Mobile/LeaveRequest/UploadFile"),
@@ -291,7 +292,7 @@ const CreateOrUpdateLeaveRequestModal = ({
 
         } catch (error) {
             console.log("upload error", error);
-            alertError(error)
+            // alertError(error)
         }
     };
 

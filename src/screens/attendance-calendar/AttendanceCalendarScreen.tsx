@@ -529,29 +529,48 @@ const AttendanceCalendarScreen = () => {
             result.attendanceRecords.forEach((record: any) => {
 
                 const date = record.calcDate.split("T")[0];
-
+                console.log(record)
                 let color = "#ccc";
                 let label = "";
+                if (record.isNormal) {
+                    if (record.isToday) {
+                        color = "#22c55e";
+                        label = "Đi làm h..";
+                    } else if (record.hasLeave) {
+                        color = "#2db6f5";
+                        label = "Nghỉ phép";
+                    } else if (record.isHoliday) {
+                        color = "#a855f7";
+                        label = "Lễ";
+                    } else {
+                        color = "#22c55e";
+                        label = "Đi làm đú..";
+                    }
+                } else if (record.absent) {
+                    if (record.hasLeave) {
+                        color = "#2db6f5";
+                        label = "Nghỉ phép";
+                    } else if (record.isHoliday) {
+                        color = "#a855f7";
+                        label = "Lễ";
+                    } else {
+                        color = "#ef4444";
+                        label = "Vắng ";
+                    }
+                } else {
+                    if (record.isLate) {
+                        color = "#f59e0b";
+                        label = "Đi muộn";
+                    };
+                    if (record.isEarlyLeave) {
+                        color = "#f59e0b";
+                        label = "Về sớm";
+                    }
+                }
 
-                if (record.hasLeave) {
-                    color = "#6366f1";
-                    label = "Nghỉ";
-                }
-                else if (record.isHoliday) {
-                    color = "#fbbf24";
-                    label = "Lễ";
-                }
-                else if (record.isNormal) {
-                    color = "#22c55e";
-                    label = "Có mặt";
-                }
-                else if (record.absent) {
-                    color = "#ef4444";
-                    label = "Vắng";
-                }
-                else {
-                    color = "#f59e0b";
-                    label = "Muộn";
+                if (record.isToday && !record.isNormal) {
+                    color = "#605DFF";
+                    label = "Chưa có dữ liệu ..";
                 }
 
                 marks[date] = {
@@ -892,7 +911,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingHorizontal: 16
+        paddingHorizontal: 16,
+        marginBottom: -8
     },
 
     statCard: {
@@ -917,7 +937,7 @@ const styles = StyleSheet.create({
 
     calendarCard: {
         backgroundColor: "#fff",
-        margin: 16,
+        margin: 14,
         borderRadius: 16,
         overflow: "hidden"
     },
