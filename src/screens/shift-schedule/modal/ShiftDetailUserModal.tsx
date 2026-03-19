@@ -70,25 +70,27 @@ const ShiftDetailUserModal = ({ visible, onClose, shiftId }: Props) => {
 
     const rows = useMemo(() => {
 
-        if (!shift || !shiftPeriodList) return [];
+        if (!shift || !shiftPeriodList?.length) return [];
 
-        const periodMap = shiftPeriodList.reduce((acc: any, p: any) => {
-            acc[p.id] = p;
-            return acc;
+        const periodMap = shiftPeriodList.reduce((map: any, period: any) => {
+            map[period.id] = period;
+            return map;
         }, {});
 
-        const mapping: any = {};
+        const dayMapping: Record<number, any[]> = {};
 
-        shift.shiftPeriodMapping?.forEach((item: any) => {
+        shift.shiftPeriodMapping?.forEach((mappingItem: any) => {
 
-            const period = periodMap[item.shiftPeriodId];
+            const period = periodMap[mappingItem.shiftPeriodId];
             if (!period) return;
 
-            if (!mapping[item.mappingIndex]) {
-                mapping[item.mappingIndex] = [];
+            const dayIndex = mappingItem.mappingIndex;
+
+            if (!dayMapping[dayIndex]) {
+                dayMapping[dayIndex] = [];
             }
 
-            mapping[item.mappingIndex].push({
+            dayMapping[dayIndex].push({
                 name: period.shiftPeriodName,
                 start: period.startTime,
                 end: period.endTime
@@ -96,26 +98,23 @@ const ShiftDetailUserModal = ({ visible, onClose, shiftId }: Props) => {
 
         });
 
-        Object.keys(mapping).forEach(key => {
-            mapping[key].sort((a: any, b: any) => a.start - b.start);
+        Object.values(dayMapping).forEach((periods: any[]) => {
+            periods.sort((a, b) => a.start - b.start);
         });
 
-        return Array.from({ length: 7 }, (_, i) => {
+        return dayNames.map((day, index) => {
 
-            const periods = (mapping[i + 1] || []).map((p: any) => {
+            const periods = (dayMapping[index + 1] || []).map((period: any) => {
 
-                const start = convertSecondsToTime(p.start);
-                const end = convertSecondsToTime(p.end);
-
+                const start = convertSecondsToTime(period.start);
+                const end = convertSecondsToTime(period.end);
                 // const text = `${p.name} (Từ Ngày hiện tại ${start}-${end} Ngày hiện tại)`;
-                // return text;
-
-                return `${p.name} (${start}-${end})`;
+                return `${period.name} (${start}-${end})`;
 
             });
 
             return {
-                day: dayNames[i],
+                day,
                 periods
             };
 
@@ -148,10 +147,8 @@ const ShiftDetailUserModal = ({ visible, onClose, shiftId }: Props) => {
 
                     </View>
 
-
                     <ScrollView showsVerticalScrollIndicator={false}>
                         {/* Thông tin lịch */}
-
 
                         <Text style={styles.sectionTitle}>
                             1. Thông tin lịch
@@ -184,11 +181,7 @@ const ShiftDetailUserModal = ({ visible, onClose, shiftId }: Props) => {
 
                         </View>
 
-
-
                         {/* Cấu hình lặp */}
-
-
 
                         <Text style={styles.sectionTitle}>
                             2. Cấu hình lặp lại
@@ -263,7 +256,6 @@ const ShiftDetailUserModal = ({ visible, onClose, shiftId }: Props) => {
                             ))}
 
                         </View>
-
 
                     </ScrollView>
 
