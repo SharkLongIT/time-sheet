@@ -1,5 +1,5 @@
 export const TIME_OUT = 10 * 1000;
-export const PER_PAGE = 10;
+export const PAGE_SIZE = 10;
 export const BASE_COLORS = {
     RED: '#F9D3D3',
     RED_BOLD: '#e19999',

@@ -1,31 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     View,
     Text,
     StyleSheet,
     FlatList,
     Pressable,
-    TouchableOpacity,
-    Modal,
-    TextInput,
     Alert,
     RefreshControl,
     ActivityIndicator
 } from "react-native";
 
 import leaveRequestUserApi from "~/api/leaveRequestUser.api";
-import { useAppColors } from "~/hooks/useAppColors";
-import { formatDate, formatDateRender } from "~/utils/format/format";
+import { formatDateRender } from "~/utils/format/format";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import leaveRequestApi from "~/api/leaveRequest.api";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { showToast } from "~/utils/toast";
 import SearchBar from "~/components/search/SearchBar";
 import { LeaveRequest } from "~/interface/leaveRequest";
 import CreateOrUpdateLeaveRequestModal from "~/screens/leave-request/modal/CreateOrUpdateLeaveRequestModal";
 import leaveRequestDepartmentApi from "~/api/leaveRequestDepartment.api";
-import { useFocusEffect } from "@react-navigation/native";
 import LeaveRequestDetailModal from "~/screens/leave-request/modal/LeaveRequestDetailModal";
+import { FabButton } from "../fab-base/FabButton";
+import { statusConfig } from "~/utils/config/statusConfig";
 
 type Props = {
     data: any[];
@@ -36,33 +31,24 @@ type Props = {
     refreshing?: boolean;
     loadingMore?: boolean;
     onRefresh?: () => void;
-};
-const statusConfig: any = {
-    0: {
-        text: "Nháp",
-        bg: "#e2e8f0",
-        color: "#475569"
-    },
-    1: {
-        text: "Chờ duyệt",
-        bg: "#fef3c7",
-        color: "#d97706"
-    },
-    2: {
-        text: "Đã duyệt",
-        bg: "#dcfce7",
-        color: "#16a34a"
-    },
-    3: {
-        text: "Từ chối",
-        bg: "#fee2e2",
-        color: "#dc2626"
-    }
+    fetchData?: (page: number, isLoadMore?: boolean) => Promise<void>;
+    isCreate?: boolean;
 };
 
-const LeaveRequestList = ({ data, emptyText, status, isManager, onEndReached, onRefresh, loadingMore }: Props) => {
 
-    const queryClient = useQueryClient();
+const LeaveRequestList = ({
+    data,
+    emptyText,
+    status,
+    isManager,
+    onEndReached,
+    onRefresh,
+    loadingMore,
+    fetchData,
+    isCreate
+}: Props) => {
+
+    // const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [modalDetailVisible, setModalDetailVisible] = useState(false);
@@ -390,20 +376,6 @@ const LeaveRequestList = ({ data, emptyText, status, isManager, onEndReached, on
                 placeholder="Tìm đơn nghỉ..."
             />
 
-            {/* <FlatList
-                data={data}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItem}
-                onEndReached={onEndReached}
-                onEndReachedThreshold={0.3}
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                ListEmptyComponent={
-                    <Text style={styles.empty}>
-                        {emptyText}
-                    </Text>
-                }
-            /> */}
             <FlatList
                 data={filteredData}
                 keyExtractor={(item) => item.id.toString()}
@@ -436,20 +408,24 @@ const LeaveRequestList = ({ data, emptyText, status, isManager, onEndReached, on
                     ) : null
                 }
             />
+            {isCreate && <FabButton onpress={() => {
+                setEditingItem(undefined);
+                setModalVisible(true);
+            }} />}
             <CreateOrUpdateLeaveRequestModal
                 visible={modalVisible}
-                isManager={false}
+                isManager={isManager || false}
                 editingItem={editingItem}
                 onClose={() => setModalVisible(false)}
-                onSubmit={(data) => {
-                    onRefresh
+                onSubmit={() => {
+                    fetchData?.(0);
                 }}
 
             />
 
             <LeaveRequestDetailModal
                 visible={modalDetailVisible}
-                isManager={isManager}
+                isManager={isManager || false}
                 editingItem={editingItem}
                 onClose={() => setModalDetailVisible(false)}
                 reopenModal={() => setModalDetailVisible(true)}

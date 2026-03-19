@@ -1,80 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import LeaveRequestList from "~/components/leave-request/LeaveRequestList";
-import { PER_PAGE } from "~/utils/common";
-import leaveRequestUserApi from "~/api/leaveRequestUser.api";
-import { FabButton } from "~/components/fab-base/FabButton";
-import CreateOrUpdateLeaveRequestModal from "../modal/CreateOrUpdateLeaveRequestModal";
-import { useFocusEffect } from "@react-navigation/native";
-import { Animated } from "react-native";
+import { useLeaveRequestUser } from "~/hooks/useLeaveRequestUser";
 
 const DraftTab = () => {
 
-    const [page, setPage] = useState(1);
-    // const [listData, setListData] = useState<any[]>([]);
-    const [refreshing, setRefreshing] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [editingItem, setEditingItem] = useState<any>();
-    const [items, setItems] = useState<any[]>([]);
-    const [totalCount, setTotalCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const opacity = useRef(new Animated.Value(0)).current;
-
-    const fetchData = React.useCallback(
-        async (pageIndex = 0, append = false) => {
-            try {
-                const res = await leaveRequestUserApi.getAllLeaveRequest({
-                    status: 0,
-                    skipCount: pageIndex * PER_PAGE,
-                    maxResultCount: PER_PAGE,
-
-                });
-
-                const rawItems = res.data.result.items;
-                setItems(prev => (append ? [...prev, ...rawItems] : rawItems));
-                setTotalCount(res.data.result.totalCount);
-            } catch (error: any) {
-
-            }
-
-        },
-        []
-    );
-    useFocusEffect(
-        React.useCallback(() => {
-            setLoading(true);
-            setPage(0);
-
-            fetchData(0).finally(() => {
-                setLoading(false);
-                Animated.timing(opacity, {
-                    toValue: 1,
-                    duration: 300,
-                    useNativeDriver: true,
-                }).start();
-            });
-        }, [fetchData])
-    );
-
-    // 🔹 Pull to refresh
-    const onRefresh = async () => {
-        setRefreshing(true);
-        setPage(0);
-        await fetchData(0);
-        setRefreshing(false);
-    };
-
-    // 🔹 Load more
-    const loadMore = async () => {
-        if (loadingMore) return;
-        if (items.length >= totalCount) return;
-
-        setLoadingMore(true);
-        const nextPage = page + 1;
-        setPage(nextPage);
-        await fetchData(nextPage, true);
-        setLoadingMore(false);
-    };
+    const {
+        items,
+        refreshing,
+        onRefresh,
+        loadMore,
+        fetchData
+    } = useLeaveRequestUser(0);
 
     return (
         <>
@@ -86,20 +22,8 @@ const DraftTab = () => {
                 onEndReached={loadMore}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-            />
-            <FabButton onpress={() => {
-                setEditingItem(undefined);
-                setModalVisible(true);
-            }} />
-
-            <CreateOrUpdateLeaveRequestModal
-                visible={modalVisible}
-                isManager={false}
-                editingItem={editingItem}
-                onClose={() => setModalVisible(false)}
-                onSubmit={() => {
-                    onRefresh();
-                }}
+                fetchData={fetchData}
+                isCreate={true}
             />
 
         </>

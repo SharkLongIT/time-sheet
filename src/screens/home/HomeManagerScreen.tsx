@@ -1,33 +1,22 @@
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React from "react";
 import {
     View,
     StyleSheet,
     ScrollView,
     Pressable,
-    Image,
     Text,
     Dimensions
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
 import { BarChart } from "react-native-chart-kit";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-import attendanceCaculatedRecordApi from "~/api/attendanceCaculatedRecord.api";
-import Weather from "~/components/weather/Weather";
 import { useAppColors } from "~/hooks/useAppColors";
-import { RootState } from "~/redux/store";
-import DateRangePicker from "~/components/date-picker/DateRangePicker";
 import HeaderMain from "~/components/layout/base-header/header-main";
-import attendanceCalculateRecordDepartmentApi from "~/api/attendanceCalculateRecordDepartment.api";
-import { Picker } from "@react-native-picker/picker";
 import { Dropdown } from "react-native-element-dropdown";
-import hrmSettingsApi from "~/api/hrmSettings.api";
-import { PieChart } from "react-native-chart-kit";
-import { alertError } from "~/utils/alertMessageServer";
+import { useHomeManager } from "~/hooks/useHomeManager";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -35,58 +24,15 @@ const HomeManagerScreen = () => {
 
     const navigation = useNavigation<DrawerNavigationProp<any>>();
     const colors = useAppColors();
-    const [summary, setSummary] = useState<any>(null);
-    const currentMonth = new Date().getMonth() + 1;
-    const months = Array.from({ length: currentMonth }, (_, i) => ({
-        label: `Tháng ${i + 1}`,
-        value: i + 1
-    }));
-    const [month, setMonth] = useState(currentMonth);
 
-    const [report, setReport] = useState<any>();
-    const [settings, setSettings] = useState<any>();
+    const {
+        month,
+        setMonth,
+        settings,
+        months,
+        report
 
-    const fetchData = async (selectedMonth: number) => {
-
-        try {
-
-            const year = new Date().getFullYear();
-
-            const startDate = new Date(year, selectedMonth - 1, 1);
-
-            const endDate = new Date(year, selectedMonth, 0);
-
-            const res =
-                await attendanceCaculatedRecordApi.getAttCalcPersonalRecordsFE({
-                    startDate,
-                    endDate
-                });
-
-            setSummary(res);
-
-            const resReport =
-                await attendanceCalculateRecordDepartmentApi
-                    .getTotalLateAbsentEarlyLeave(selectedMonth);
-
-
-            setReport(resReport.data.result);
-
-            const resSettings = await hrmSettingsApi.getAllSettings();
-            setSettings(resSettings.data?.result?.settingsDashboard)
-
-        } catch (error) {
-
-            console.log(error);
-            alertError(error)
-
-        }
-
-    };
-
-    useEffect(() => {
-        fetchData(month);
-    }, [month]);
-
+    } = useHomeManager();
 
     /* ===== Leave ===== */
 

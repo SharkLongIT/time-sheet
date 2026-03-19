@@ -14,7 +14,7 @@ import { useAppColors } from "~/hooks/useAppColors";
 import holidayApi from "~/api/holiday.api";
 import { Holiday } from "~/interface/holiday";
 
-import { PER_PAGE } from "~/utils/common";
+import { PAGE_SIZE } from "~/utils/common";
 import { addDays, formatDateRender } from "~/utils/format/format";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -37,8 +37,8 @@ const HolidayScreen = () => {
     const fetchData = useCallback(async (pageIndex = 0, append = false) => {
         try {
             const res = await holidayApi.getHolidaySettings({
-                skipCount: pageIndex * PER_PAGE,
-                maxResultCount: PER_PAGE
+                skipCount: pageIndex * PAGE_SIZE,
+                maxResultCount: PAGE_SIZE
             });
 
             const result = res.data.result;

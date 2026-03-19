@@ -5,11 +5,8 @@ import {
     StyleSheet,
     TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-
-import HeaderMain from '~/components/layout/base-header/header-main';
 import { appColors } from '~/utils/constants/appColors';
 import { EnLangIcon, ViLangIcon } from '~/assets/icons';
 import { BaseContent } from '~/components/base-screen/BaseContent';

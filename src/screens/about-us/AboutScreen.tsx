@@ -1,9 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import HeaderMain from '~/components/layout/base-header/header-main';
 import { appColors } from '~/utils/constants/appColors';
 import { BaseContent } from '~/components/base-screen/BaseContent';
 import { useAppColors } from '~/hooks/useAppColors';
@@ -13,10 +11,8 @@ const AboutScreen = () => {
     const { t } = useTranslation();
     const colors = useAppColors();
     const version = DeviceInfo.getVersion();
-    const buildNumber = DeviceInfo.getBuildNumber();
     return (
         <BaseContent >
-            {/* <HeaderMain title={t('about.title')} /> */}
 
             <View style={styles.container}>
                 <Image
@@ -26,7 +22,6 @@ const AboutScreen = () => {
                 />
 
                 <Text style={[styles.appName, { color: colors.textPrimary }]}>
-                    {/* {t('about.appName')} */}
                     TimeSheet
                 </Text>
 

@@ -18,7 +18,7 @@ import leaveRequestDepartmentApi from "~/api/leaveRequestDepartment.api";
 import AppSelect from "~/components/select-base/AppSelect";
 import { useAppColors } from "~/hooks/useAppColors";
 import { alertError } from "~/utils/alertMessageServer";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { MainParamList } from "~/navigation/MainNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 

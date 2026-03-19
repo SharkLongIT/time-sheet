@@ -1,6 +1,6 @@
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import {
     View,
@@ -9,67 +9,34 @@ import {
     Pressable,
     Image,
     Text,
-    Dimensions,
     ActivityIndicator
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
-import { BarChart } from "react-native-chart-kit";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-import attendanceCaculatedRecordApi from "~/api/attendanceCaculatedRecord.api";
 import Weather from "~/components/weather/Weather";
 import { useAppColors } from "~/hooks/useAppColors";
 import { RootState } from "~/redux/store";
 import DateRangePicker from "~/components/date-picker/DateRangePicker";
-import { alertError } from "~/utils/alertMessageServer";
+import { useHome } from "~/hooks/useHome";
 
-const screenWidth = Dimensions.get("window").width;
 
 const HomeScreen = () => {
+    const {
+        fetchData,
+        summary,
+        loading,
+        setToDate,
+        setFromDate,
+        fromDate,
+        toDate
+    } = useHome();
 
     const navigation = useNavigation<DrawerNavigationProp<any>>();
     const { t } = useTranslation();
     const colors = useAppColors();
     const auth = useSelector((state: RootState) => state.auth.user);
-    const [loading, setLoading] = useState(false);
-    const [summary, setSummary] = useState<any>(null);
-
-    const [fromDate, setFromDate] = useState(
-        new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-    );
-
-    const [toDate, setToDate] = useState(new Date());
-    const fetchData = async (start: Date, end: Date) => {
-
-        try {
-
-            setLoading(true);
-
-            const res =
-                await attendanceCaculatedRecordApi.getAttCalcPersonalRecordsFE({
-                    startDate: start,
-                    endDate: end
-                });
-
-            setSummary(res.data.result);
-
-        } catch (error) {
-            console.log(error);
-            alertError(error)
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-    useEffect(() => {
-
-        fetchData(fromDate, toDate);
-
-    }, []);
     /* ===== Attendance ===== */
 
     const lateCount = summary?.totalLateDays ?? 0;

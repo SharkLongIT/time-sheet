@@ -18,27 +18,22 @@ import leaveRequestApi from "~/api/leaveRequest.api";
 import leaveRequestUserApi from "~/api/leaveRequestUser.api";
 import leaveRequestAttApi from "~/api/leaveRequestAtt.api";
 import leaveRequestDepartmentApi from "~/api/leaveRequestDepartment.api";
-
 import DatePickerField from "~/components/date-picker/DatePickerField";
 import AppSelect from "~/components/select-base/AppSelect";
-
 import { pick } from "@react-native-documents/picker";
-
 import { useAppColors } from "~/hooks/useAppColors";
-import { getFileBytes } from "~/utils/convert/convertFile";
 import { showToast } from "~/utils/toast";
 import axios from "axios";
-import uuid from 'react-native-uuid';
 import { buildUrl } from "~/helper/url.helper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
 import { alertError } from "~/utils/alertMessageServer";
+
 interface Props {
     visible: boolean;
     isManager: boolean;
     onClose: () => void;
     editingItem?: any;
-    onSubmit?: (data: any) => void;
+    onSubmit: () => void;
 }
 
 const CreateOrUpdateLeaveRequestModal = ({
@@ -333,7 +328,7 @@ const CreateOrUpdateLeaveRequestModal = ({
             }
             await uploadAttachments(leaveRequest.id);
 
-            onSubmit?.(leaveRequest);
+            onSubmit();
 
             handleClose();
 
@@ -370,9 +365,9 @@ const CreateOrUpdateLeaveRequestModal = ({
 
             const payload = {
                 id: editingItem.id,
-                leaveTypeCategoryUnitId,
+                leaveTypeCategoryUnitId: Number(leaveTypeCategoryUnitId),
                 reason,
-                userId,
+                userId: Number(userId),
                 startTime: formatDate(startTime),
                 endTime: timeType === 0 ? formatDate(endTime) : formatDate(startTime),
                 timeType,
@@ -383,7 +378,7 @@ const CreateOrUpdateLeaveRequestModal = ({
 
             await uploadAttachments(editingItem.id);
 
-            onSubmit?.(res.data.result);
+            onSubmit();
 
             handleClose();
 
@@ -395,6 +390,7 @@ const CreateOrUpdateLeaveRequestModal = ({
                 "Lỗi cập nhật",
                 error?.error?.message || "Có lỗi xảy ra"
             );
+            console.log(error);
 
         }
 
