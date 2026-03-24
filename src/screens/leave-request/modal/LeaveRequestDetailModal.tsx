@@ -46,7 +46,7 @@ const LeaveRequestDetailModal = ({
     const [users, setUsers] = useState<any[]>([]);
 
     const [leaveTypeCategoryUnitId, setLeaveTypeCategoryUnitId] = useState<string>();
-    const [userId, setUserId] = useState<string>(auth?.id?.toString() || "");
+    const [userId] = useState<string>(auth?.id?.toString() || "");
 
     const [reason, setReason] = useState("");
     const [startTime, setStartTime] = useState<Date>();
@@ -291,7 +291,7 @@ const LeaveRequestDetailModal = ({
 
                         <Text style={styles.label}>Tệp minh chứng</Text>
 
-                        {attachment && (
+                        {attachment ? (
                             <Pressable
                                 onPress={() => {
                                     onClose();
@@ -319,6 +319,8 @@ const LeaveRequestDetailModal = ({
                                 </Text>
 
                             </Pressable>
+                        ) : (
+                            <Text style={styles.emptyText}>Không có tệp minh chứng</Text>
                         )}
 
 
@@ -493,4 +495,8 @@ const styles = StyleSheet.create({
     required: {
         color: '#EF4444',
     },
+    emptyText: {
+        color: "#6b7280",
+        fontStyle: "italic"
+    }
 });

@@ -28,6 +28,7 @@ import ListUsersAttendanceCalendarScreen from '~/screens/attendance-calendar/Lis
 import ListUsersShiftScheduleScreen from '~/screens/shift-schedule/ListUsersShiftScheduleScreen';
 import ShiftScheduleDepartmentScreen from '~/screens/shift-schedule/ShiftScheduleDepartmentScreen';
 import ViewFile from '~/components/leave-request/ViewFile';
+import ViewPdf from '~/components/leave-request/ViewFileUpload';
 
 export type MainParamList = {
     // MainTab: NavigatorScreenParams<BottomTabParamList>;
@@ -53,7 +54,8 @@ export type MainParamList = {
     LeaveRequestManage: undefined;
     ListUsersAttendanceCalendar: undefined;
     ListUsersShiftSchedule: undefined;
-    ViewFile: { title?: string, filepath: string, type: number, reopenModal: () => void }
+    ViewFile: { title?: string, filepath: string, type: number, reopenModal: () => void };
+    ViewPdf: { title?: string, filepath: string, type: number, reopenModal: () => void };
 
 };
 export type DrawerParamList = {
@@ -109,7 +111,7 @@ export default function MainStack() {
             <Stack.Screen name="ListUsersAttendanceCalendar" options={{ title: 'Quản lý chấm công' }} component={ListUsersAttendanceCalendarScreen} />
             <Stack.Screen name="ListUsersShiftSchedule" options={{ title: 'Lịch ca làm việc' }} component={ListUsersShiftScheduleScreen} />
             <Stack.Screen name="ViewFile" options={{ title: 'Chi tiết' }} component={ViewFile} />
-
+            <Stack.Screen name="ViewPdf" options={{ title: 'Chi tiết' }} component={ViewPdf} />
         </Stack.Navigator>
     );
 }

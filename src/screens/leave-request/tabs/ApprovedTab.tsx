@@ -12,6 +12,7 @@ const ApprovedTab = () => {
         refreshing,
         onRefresh,
         loadMore,
+        totalCount
     } = useLeaveRequestUser(2);
     return (
         <>
@@ -23,6 +24,8 @@ const ApprovedTab = () => {
                 onEndReached={loadMore}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
+                // title={`Đã duyệt (${totalCount})`}
+                title="Đã duyệt"
             />
 
         </>

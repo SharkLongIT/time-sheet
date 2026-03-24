@@ -8,7 +8,8 @@ const ApprovedTab = () => {
         items,
         refreshing,
         onRefresh,
-        loadMore
+        loadMore,
+        totalCount
     } = useLeaveRequestDepartment(2);
     return (
         <>
@@ -20,6 +21,8 @@ const ApprovedTab = () => {
                 onEndReached={loadMore}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
+                // title={`Đã duyệt (${totalCount})`}
+                title="Đã duyệt"
             />
 
         </>

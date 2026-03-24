@@ -73,7 +73,8 @@ const HolidayScreen = () => {
         const keyword = search.toLowerCase();
 
         return items.filter(item =>
-            item.title?.toLowerCase().includes(keyword)
+            item.title?.toLowerCase().includes(keyword) ||
+            item.numberOfDays?.toString().includes(keyword)
         );
 
     }, [items, search]);
@@ -163,7 +164,7 @@ const HolidayScreen = () => {
             <SearchBar
                 value={search}
                 onChange={setSearch}
-                placeholder="Tìm kỳ nghỉ..."
+                placeholder="Tìm kỳ nghỉ, số ngày nghỉ"
             />
 
         </View>

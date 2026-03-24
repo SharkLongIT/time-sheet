@@ -8,6 +8,7 @@ const PendingTab = () => {
         refreshing,
         onRefresh,
         loadMore,
+        totalCount
     } = useLeaveRequestUser(1);
 
     return (
@@ -20,6 +21,8 @@ const PendingTab = () => {
                 onEndReached={loadMore}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
+                // title={`Chờ duyệt (${totalCount})`}
+                title="Chờ duyệt"
             />
 
 

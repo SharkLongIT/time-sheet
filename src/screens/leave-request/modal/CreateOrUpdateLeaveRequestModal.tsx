@@ -27,6 +27,7 @@ import axios from "axios";
 import { buildUrl } from "~/helper/url.helper";
 import { useQueryClient } from "@tanstack/react-query";
 import { alertError } from "~/utils/alertMessageServer";
+import FileViewer from "react-native-file-viewer";
 
 interface Props {
     visible: boolean;
@@ -395,7 +396,15 @@ const CreateOrUpdateLeaveRequestModal = ({
         }
 
     };
+    const handleOpenFile = async () => {
+        try {
+            if (!attachment?.uri) return;
 
+            await FileViewer.open(attachment.uri);
+        } catch (error) {
+            console.log("Cannot open file", error);
+        }
+    };
     // handle
 
     return (
@@ -584,7 +593,7 @@ const CreateOrUpdateLeaveRequestModal = ({
 
                         {/* {attachments.map((file, index) => ( */}
                         {attachment && (
-                            <View key={attachment.name} style={styles.fileItem}>
+                            <Pressable key={attachment.name} style={styles.fileItem} onPress={handleOpenFile}>
 
                                 <Ionicons name="document-outline" size={18} />
 
@@ -596,7 +605,7 @@ const CreateOrUpdateLeaveRequestModal = ({
                                     <Ionicons name="close-circle" size={18} color="red" />
                                 </Pressable>
 
-                            </View>
+                            </Pressable>
                         )}
 
 

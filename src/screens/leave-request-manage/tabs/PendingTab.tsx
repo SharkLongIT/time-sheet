@@ -8,7 +8,8 @@ const PendingTab = () => {
         items,
         refreshing,
         onRefresh,
-        loadMore
+        loadMore,
+        totalCount
     } = useLeaveRequestDepartment(1);
     return (
         <>
@@ -21,6 +22,8 @@ const PendingTab = () => {
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 isCreate={true}
+                // title={`Chờ duyệt (${totalCount})`}
+                title="Chờ duyệt"
             />
         </>
     );

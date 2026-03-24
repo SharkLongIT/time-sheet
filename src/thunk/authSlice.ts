@@ -69,6 +69,8 @@ const authSlice = createSlice({
             // ===== LOGOUT =====
             .addCase(handleLogout.fulfilled, state => {
                 state.user = null;
+                state.token = null;
+                state.tenant = null;
                 //  state.isReady = true;
             });
     },

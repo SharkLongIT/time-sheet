@@ -9,7 +9,8 @@ const DraftTab = () => {
         refreshing,
         onRefresh,
         loadMore,
-        fetchData
+        fetchData,
+        totalCount
     } = useLeaveRequestUser(0);
 
     return (
@@ -24,6 +25,8 @@ const DraftTab = () => {
                 onRefresh={onRefresh}
                 fetchData={fetchData}
                 isCreate={true}
+                // title={`Nháp (${totalCount})`}
+                title="Nháp"
             />
 
         </>

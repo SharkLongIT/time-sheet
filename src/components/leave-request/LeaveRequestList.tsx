@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import {
     View,
     Text,
@@ -21,6 +21,9 @@ import leaveRequestDepartmentApi from "~/api/leaveRequestDepartment.api";
 import LeaveRequestDetailModal from "~/screens/leave-request/modal/LeaveRequestDetailModal";
 import { FabButton } from "../fab-base/FabButton";
 import { statusConfig } from "~/utils/config/statusConfig";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { MainParamList } from "~/navigation/MainNavigator";
 
 type Props = {
     data: any[];
@@ -33,6 +36,7 @@ type Props = {
     onRefresh?: () => void;
     fetchData?: (page: number, isLoadMore?: boolean) => Promise<void>;
     isCreate?: boolean;
+    title?: string;
 };
 
 
@@ -45,16 +49,26 @@ const LeaveRequestList = ({
     onRefresh,
     loadingMore,
     fetchData,
-    isCreate
+    isCreate,
+    title
 }: Props) => {
 
     // const queryClient = useQueryClient();
+    const navigation =
+        useNavigation<NativeStackNavigationProp<MainParamList>>();
     const [search, setSearch] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [modalDetailVisible, setModalDetailVisible] = useState(false);
     const [editingItem, setEditingItem] = useState<any>();
     const [page, setPage] = useState(1);
     const [refreshing, setRefreshing] = useState(false);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: title || ''
+        });
+    }, [title]);
+
     // console.log(data)
     const filteredData = useMemo(() => {
 
@@ -382,6 +396,7 @@ const LeaveRequestList = ({
                 renderItem={renderItem}
                 onEndReached={onEndReached}
                 onEndReachedThreshold={0.3}
+                showsVerticalScrollIndicator={false}
 
                 refreshControl={
                     <RefreshControl

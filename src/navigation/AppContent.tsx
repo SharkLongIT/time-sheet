@@ -8,35 +8,50 @@ import { NavigatorScreenParams } from '@react-navigation/native';
 import SplashScreen from '~/components/splash-screen/SplashScreen';
 import { checkHasSeenWelcome } from '~/thunk/appSlice';
 import OnBoardingScreen from '~/components/onboarding/OnBoardingScreen';
+import { useAppBootstrap } from '~/hooks/useAppBootstrap';
 
 export type RootParamList = {
     Splash: undefined;
     main: NavigatorScreenParams<MainParamList>;
     auth: NavigatorScreenParams<AuthParamList>;
 };
-
 export default function AppContent() {
-    const dispatch = useDispatch<AppDispatch>();
+
+    useAppBootstrap();
+
     const { user, isReady: authReady } = useSelector((state: RootState) => state.auth);
     const { hasSeenWelcome } = useSelector((state: RootState) => state.app);
 
-    useEffect(() => {
-        dispatch(checkAuth());
-        dispatch(checkHasSeenWelcome());
-    }, [dispatch]);
+    const appReady = authReady && hasSeenWelcome !== null;
 
-    const appReady =
-        authReady &&
-        hasSeenWelcome !== null;
-    if (!appReady) {
-        return <SplashScreen />;
-    }
+    if (!appReady) return <SplashScreen />;
 
     if (!hasSeenWelcome) return <OnBoardingScreen />;
 
-    if (!user) {
-        return <AuthStack />;
-    }
-
-    return <MainStack />;
+    return user ? <MainStack /> : <AuthStack />;
 }
+// export default function AppContent() {
+//     const dispatch = useDispatch<AppDispatch>();
+//     const { user, isReady: authReady } = useSelector((state: RootState) => state.auth);
+//     const { hasSeenWelcome } = useSelector((state: RootState) => state.app);
+
+//     useEffect(() => {
+//         dispatch(checkAuth());
+//         dispatch(checkHasSeenWelcome());
+//     }, [dispatch]);
+
+//     const appReady =
+//         authReady &&
+//         hasSeenWelcome !== null;
+//     if (!appReady) {
+//         return <SplashScreen />;
+//     }
+
+//     if (!hasSeenWelcome) return <OnBoardingScreen />;
+
+//     if (!user) {
+//         return <AuthStack />;
+//     }
+
+//     return <MainStack />;
+// }

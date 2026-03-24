@@ -8,7 +8,8 @@ const RejectTab = () => {
         items,
         refreshing,
         onRefresh,
-        loadMore
+        loadMore,
+        totalCount
     } = useLeaveRequestDepartment(3);
 
     return (
@@ -21,6 +22,8 @@ const RejectTab = () => {
                 onEndReached={loadMore}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
+                // title={`Từ chối (${totalCount})`}
+                title="Từ chối"
             />
 
         </>
